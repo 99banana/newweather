@@ -313,5 +313,5 @@ let server = http.createServer(function (request, response) {
 			response.end(Mustache.render(data, values));
 		});
 	}
-}).listen(8080, "127.0.0.1");
+}).listen(80);
 console.log('Server running!');
