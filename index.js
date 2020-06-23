@@ -258,7 +258,7 @@ function getWeather(latitude, longitude) {
 getWeather(38.466630, -78.880290);
 
 let server = http.createServer(function (request, response) {
-	if(request.url.startsWith('/forecast')) {
+	if(request.url.startsWith('/forecast/')) {
 		let longitude = request.url.split('/')[3];
 		let latitude = request.url.split('/')[2];
 		let forecast = weather[latitude+","+longitude];
@@ -297,21 +297,23 @@ let server = http.createServer(function (request, response) {
 				snowFall: forecast.snowFall
 			});
 		}
-	}else if(request.url.startsWith('/canvasjs')) {
+	}else if(request.url.startsWith('/resource/')) {
 		response.writeHead(200, {'Content-Type': 'text/html'});
-		fs.readFile('.'+request.url, 'utf8', function(err, data) {
-			if (err) { throw err; }
-			response.end(data);
+		console.log(request.url.replace('/resource', ''));
+		fs.readFile('.'+request.url.replace('/resource', '/'), 'utf8', function(err, data) {
+			if (!err) {
+				response.end(data);
+			}else {
+				console.log(err);
+			}
 		});
 	}else {
-		let values = {
-			
-		};
+		let values = {};
 		response.writeHead(200, {'Content-Type': 'text/html'});
 		fs.readFile('./index.html', 'utf8', function(err, data) {
 			if (err) { throw err; }
 			response.end(Mustache.render(data, values));
 		});
 	}
-}).listen(80);
+}).listen(8080, "127.0.0.1");
 console.log('Server running!');

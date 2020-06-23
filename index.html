@@ -83,6 +83,15 @@
 				font-size:15px;
 				font-weight:bold;
 			}
+			.githubButton {
+				color:black;
+				text-decoration:none;
+				border: 1px solid #ccc;
+				border-radius:3px;
+				padding:3px 7px;
+				background: rgb(175,175,175);
+				background: linear-gradient(0deg, rgba(226,235,234,1) 0%, rgba(255,255,255,1) 100%);
+			}
 		</style>
 		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 	</head>
@@ -93,9 +102,9 @@
 			Latitude <input id="lat" type="number" value="38.466630">
 			Longitude <input id="long" type="number" value="-78.880290">
 			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value">Get Forecast</button>
-			<button id="autoButton" onclick='getLocation();'>Autodetect location</button>
+			<button id="autoButton" onclick="getLocation();">Autodetect location</button><br>
+			<a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png">View source code on GitHub</a>
 		</div>
-		
 		<script>
 var xxx = document.getElementById("autoButton");
 var yyy = document.getElementById("forecastButton");
@@ -103,6 +112,7 @@ function getLocation() {
 	xxx.innerHTML = "Detecting...";
 	yyy.style.background = '#eee';
 	yyy.style.boxShadow = 'none';
+  yyy.style.color = 'grey';
 	yyy.style.cursor = 'default';
 	console.log(window.parent.document.location.protocol);
 	if(window.parent.document.location.protocol === 'http:') {
@@ -121,9 +131,10 @@ function showPosition(position) {
 	yyy.style.background = 'lightgrey';
 	yyy.style.boxShadow = '3px 3px 5px lightgrey';
 	yyy.style.cursor = 'pointer';
-	xxx.innerHTML = "Try again";
+	xxx.style.display = 'none';
+  yyy.style.color = 'black';
 	yyy.style.background = 'lightgreen';
-	console.log(poisition);
+	console.log(position);
 	document.getElementById('lat').value = Math.floor(position.coords.latitude*1000000)/1000000;
 	document.getElementById('long').value = Math.floor(position.coords.longitude*1000000)/1000000;
 }
@@ -139,7 +150,7 @@ function showPosition(position) {
 		
 		{{#error}}
 		<h3>Error getting weather data! (position {{latitude}}, {{longitude}})</h3>
-		<h4>This could be because of an <b style="color:darkred;">invalid Lat/Lon</b> or a <b style="color:darkred;">temporary API outage</b>.<br>Retrying in 25 seconds...</h4>
+		<h4>This could be because of an <b style="color:darkred;">invalid location</b> or a <b style="color:darkred;">temporary API outage</b>.<br>Retrying in 25 seconds...</h4>
 		<script>
 			setTimeout(function() {
 				location.reload();
@@ -150,7 +161,6 @@ function showPosition(position) {
 		{{#forecast}}
 		<div id="chartContainer2" style="height: 370px; width: 100%; position: relative"></div>
 		<div id="chartContainer1" style="height: 370px; width: 100%; position: relative"></div>
-	<div class="higher">
 		<br>
 		<button onclick="document.getElementById('dailyDetails').style.display = 'none'; document.getElementById('dailyhide').style.display = 'inline';">- Hide Daily Details (Table)</button>
 		<button id="dailyhide" style="display:none;" onclick="document.getElementById('dailyDetails').style.display = 'block';">+ expand</button>
@@ -162,9 +172,7 @@ function showPosition(position) {
 				</tr>
 				{{&sevenDay.details}}
 			</table>
-			{{#sevenDay.details}}
-			Oops! Table data is not available right now!
-			{{/sevenDay.details}}
+			Oops! Table data is not available yet!
 		</div>
 		<script>
 CanvasJS.addColorSet("default2",
@@ -434,10 +442,6 @@ for(let xxy = 0; xxy < document.querySelectorAll(".canvasjs-chart-container > .c
 }
 		</script>
 		{{/forecast}}
-	</div>
-	<div class="footer">
-		NewWeather is open source!
-		<a class="github-button" href="https://github.com/Bananabob999/newweather" data-color-scheme="no-preference: light; light: light; dark: light;" aria-label="View on GitHub">View on GitHub</a></div>
 		<script async defer src="https://buttons.github.io/buttons.js"></script>
 	</body>
 </html>
