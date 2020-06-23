@@ -1,0 +1,441 @@
+<html>
+	<head>
+		<title>Weather ... ?</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				font-family:Arial, sans-serif;
+				padding:50px;
+				padding-bottom:0px;
+				margin-bottom:0px;
+				position:relative;
+			}
+			p, div {
+				font-size:1em;
+			}
+			input {
+				padding:5px;
+				border:1px transparent;
+				background:white;
+				box-shadow:3px 3px 5px lightgrey;
+				font-size:1em;
+			}
+			button {
+				padding:8px;
+				border:1px transparent;
+				font-size:1.1em;
+				font-weight:bold;
+				background:lightgrey;
+				box-shadow:3px 3px 5px lightgrey;
+				cursor:pointer;
+			}
+			.form {
+				padding:5px;
+				text-align:center;
+			}
+			h1, h2, h3, h4, h5 {
+				text-align:center;
+			}
+			table {
+				border-collapse:collapse;
+				width:100%;
+			}
+			td {
+				text-align:center;
+				padding:3px;
+			}
+			tr:nth-child(even) {background-color: #f2f2f2;}
+			tr:hover {
+				background-color: #ddd;
+			}
+			th {
+				padding:10px;
+				font-size:1.2em;
+				background-color:#ddd;
+			}
+			.header {
+				z-index:199;
+				background:white;
+				padding:10px;
+				margin:0px;
+				overflow:auto;
+			}
+			#floatdiv {
+				position:fixed;
+				top:-50px;
+				height:200%;
+				width:2px;
+				background:red;
+				z-index:99;
+			}
+			#floatdiv:hover {
+				background:darkred;
+			}
+			#nooo {
+				position:fixed;
+				top:5;
+				left:5;
+			}
+			.footer {
+				background-color:lightgrey;
+				padding:10px;
+				margin-top:20px;
+				font-size:15px;
+				font-weight:bold;
+			}
+		</style>
+		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	</head>
+	<body>
+	<div class="header">
+		<h2 style="padding:2px; margin:2px;" >Select location:</h2>
+		<div class="form">
+			Latitude <input id="lat" type="number" value="38.466630">
+			Longitude <input id="long" type="number" value="-78.880290">
+			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value">Get Forecast</button>
+			<button id="autoButton" onclick='getLocation();'>Autodetect location</button>
+		</div>
+		
+		<script>
+var xxx = document.getElementById("autoButton");
+var yyy = document.getElementById("forecastButton");
+function getLocation() {
+	xxx.innerHTML = "Detecting...";
+	yyy.style.background = '#eee';
+	yyy.style.boxShadow = 'none';
+	yyy.style.cursor = 'default';
+	console.log(window.parent.document.location.protocol);
+	if(window.parent.document.location.protocol === 'http:') {
+		yyy.style.background = 'lightgrey';
+		yyy.style.boxShadow = '3px 3px 5px lightgrey';
+		yyy.style.cursor = 'pointer';
+		xxx.innerHTML = "Error";
+		yyy.style.background = 'lightgrey';
+		alert("Oops. Autodetecting location is only available on a secure connection.");
+	}else {
+		navigator.geolocation.getCurrentPosition(showPosition);
+	}
+}
+
+function showPosition(position) {
+	yyy.style.background = 'lightgrey';
+	yyy.style.boxShadow = '3px 3px 5px lightgrey';
+	yyy.style.cursor = 'pointer';
+	xxx.innerHTML = "Try again";
+	yyy.style.background = 'lightgreen';
+	console.log(poisition);
+	document.getElementById('lat').value = Math.floor(position.coords.latitude*1000000)/1000000;
+	document.getElementById('long').value = Math.floor(position.coords.longitude*1000000)/1000000;
+}
+		</script>
+		{{#refresh}}
+		<h3>Loading weather data...</h3>
+		<script>
+			setTimeout(function() {
+				location.reload();
+			}, 100);
+		</script>
+		{{/refresh}}
+		
+		{{#error}}
+		<h3>Error getting weather data! (position {{latitude}}, {{longitude}})</h3>
+		<h4>This could be because of an <b style="color:darkred;">invalid location</b> or a <b style="color:darkred;">temporary API outage</b>.<br>Retrying in 25 seconds...</h4>
+		<script>
+			setTimeout(function() {
+				location.reload();
+			}, 25000);
+		</script>
+		{{/error}}
+	</div>
+		{{#forecast}}
+		<div id="chartContainer2" style="height: 370px; width: 100%; position: relative"></div>
+		<div id="chartContainer1" style="height: 370px; width: 100%; position: relative"></div>
+	<div class="higher">
+		<br>
+		<button onclick="document.getElementById('dailyDetails').style.display = 'none'; document.getElementById('dailyhide').style.display = 'inline';">- Hide Daily Details (Table)</button>
+		<button id="dailyhide" style="display:none;" onclick="document.getElementById('dailyDetails').style.display = 'block';">+ expand</button>
+		<div id="dailyDetails" style="display:block;">
+			<br>
+			<table>
+				<tr>
+					<th>Time</th><th>Temperature</th><th>Wind</th><th>Description</th><th>Image</th>
+				</tr>
+				{{&sevenDay.details}}
+			</table>
+			Oops! Table data is not available yet!
+		</div>
+		<script>
+CanvasJS.addColorSet("default2",
+	[//colorSet Array
+	"#000000",
+	"#ff5050",
+	"#0066ff",
+	"#0099ff",
+	"#90EE90"                
+	]);
+CanvasJS.addColorSet("default1",
+	[//colorSet Array
+	"#000000",
+	"#ff5050",
+	"#0066ff",
+	"#0099ff",
+	"#90EE90"                
+	]);
+		
+var chart = new CanvasJS.Chart("chartContainer2", {
+	colorSet:"default2",
+	title:{
+		text: "7-day Forecast"
+	},
+	theme: 'light2',
+	axisY: {
+		includeZero: false,
+		suffix: "",
+		gridThickness: 1,
+		gridColor: 'lightgrey'
+	},
+	axisX: {
+		gridThickness: 1,
+		gridColor: 'lightgrey'
+	},
+	toolTip:{
+		shared: true,
+		borderColor: "#2E8B57",
+		contentFormatter: function (e) {
+			let content = " ";
+			for (let i = 0; i < e.entries.length; i++) {
+				let point = e.entries[i].dataPoint;
+				if(point.precipChance !== undefined) {
+					let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+					let months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+					let day = days[point.x.getDay()];
+					let month = months[point.x.getMonth()];
+					let hours = point.x.getHours() + 1;
+					let apm = "PM";
+					if(hours > 12) {
+						hours-=12;
+					}else { apm = "AM"; }
+					
+					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b>Temperature:</b> "+Math.floor(point.temperature)+" F<br><b>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b>Thunder chance:</b> "+Math.floor(point.thunderChance)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
+					return content;
+				}
+				/*content += e.entries[i].dataSeries.name + " " + "<strong>" + e.entries[i].dataPoint.y + "</strong>";
+				content += "<br/>";*/
+			}
+			content+= "No precise data<br> for this time.";
+			return content;
+		}
+	},
+	options: {
+		elements: {
+			point: {
+				radius: 0
+			}
+		}
+	},
+	legend:{
+		cursor: "pointer",
+		fontSize: 16,
+		itemclick: toggleDataSeries,
+	},
+	data: [
+	{
+		name: "TooltipWeather",
+		type: "spline",
+		legendText: "Thunder",
+		markerType: "none",
+		showInLegend: false,
+		dataPoints: [
+			{{&allWeather}}
+		]
+	},
+	{
+		legendText: "Temperature",
+		markerType: "none",
+		type: "spline",
+		yValueFormatString: "<b>## F</b>",
+		showInLegend: true,
+		dataPoints: [
+			{{&temperature}}
+		]
+	},
+	{
+		legendText: "Precip. % chance",
+		type: "splineArea",
+		markerType: "none",
+		yValueFormatString: "##",
+		showInLegend: true,
+		dataPoints: [
+			{{&precipitation}}
+		]
+	}
+	]
+});
+chart.render();
+
+var chart1 = new CanvasJS.Chart("chartContainer1", {
+	colorSet:"default1",
+	title:{
+		text: ""
+	},
+	theme: 'light2',
+	axisY: {
+		includeZero: false,
+		suffix: "",
+		gridThickness: 1,
+		gridColor: 'lightgrey'
+	},
+	axisX: {
+		gridThickness: 1,
+		gridColor: 'lightgrey'
+	},
+	toolTip:{
+		shared: true,
+		borderColor: "#2E8B57",
+		contentFormatter: function (e) {
+			let content = " ";
+			for (let i = 0; i < e.entries.length; i++) {
+				let point = e.entries[i].dataPoint;
+				if(point.precipChance !== undefined) {
+					let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+					let months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+					let day = days[point.x.getDay()];
+					let month = months[point.x.getMonth()];
+					let hours = point.x.getHours() + 1;
+					let apm = "PM";
+					if(hours > 12) {
+						hours-=12;
+					}else { apm = "AM"; }
+					
+					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b>Thunder chance:</b> "+Math.floor(point.thunderChance)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
+					return content;
+				}
+				/*content += e.entries[i].dataSeries.name + " " + "<strong>" + e.entries[i].dataPoint.y + "</strong>";
+				content += "<br/>";*/
+			}
+			content+= "No precise data<br> for this time.";
+			return content;
+		}
+	},
+	options: {
+		elements: {
+			point: {
+				radius: 0
+			}
+		}
+	},
+	legend:{
+		cursor: "pointer",
+		fontSize: 16,
+		itemclick: toggleDataSeries,
+	},
+	data: [
+	{
+		name: "TooltipWeather",
+		type: "spline",
+		legendText: "Thunder",
+		markerType: "none",
+		showInLegend: false,
+		dataPoints: [
+			{{&allWeather}}
+		]
+	},
+	{
+		legendText: "Wind speed",
+		type: "spline",
+		markerType: "none",
+		yValueFormatString: "## mph",
+		showInLegend: true,
+		dataPoints: [
+			{{&windSpeed}}
+		]
+	},
+	{
+		legendText: "Precip. Accum. Total",
+		type: "splineArea",
+		markerType: "none",
+		legendMarkerType: "circle",
+		yValueFormatString: "##",
+		showInLegend: true,
+		dataPoints: [
+			{{&precipitationTotal}}
+		]
+	},
+	{
+		name: "Thunder Chance:",
+		type: "spline",
+		legendText: "Thunder",
+		markerType: "none",
+		yValueFormatString: "##",
+		showInLegend: true,
+		dataPoints: [
+			{{&thunder}}
+		]
+	}
+	]
+});
+chart1.render();
+
+function positionImage(image, index) {
+	var imageCenter = chart.axisX[0].convertValueToPixel(chart.data[0].dataPoints[index].x);
+	var imageTop =  chart.axisY[0].convertValueToPixel(chart.axisY[0].maximum);
+
+	image.width("40px")
+	.css({ "left": imageCenter - 20 + "px",
+	"position": "absolute","top":imageTop + "px",
+	"position": "absolute"});
+}
+function formatter(e) { 
+	if(e.index === 0 && e.dataPoint.x === 0) {
+		return " Min " + e.dataPoint.y[e.index] + "°";
+	} else if(e.index == 1 && e.dataPoint.x === 0) {
+		return " Max " + e.dataPoint.y[e.index] + "°";
+	} else{
+		return e.dataPoint.y[e.index] + "°";
+	}
+}
+function toggleDataSeries(e){
+	if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+		e.dataSeries.visible = false;
+	}
+	else{
+		e.dataSeries.visible = true;
+	}
+	chart.render();
+}
+function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+		x: evt.clientX - rect.left,
+		y: evt.clientY - rect.top
+    };
+}
+let elementsList = [];
+for(let xxy = 0; xxy < document.querySelectorAll(".canvasjs-chart-container > .canvasjs-chart-canvas").length; xxy++) {
+	if(document.querySelectorAll(".canvasjs-chart-container > .canvasjs-chart-canvas")[xxy]) {
+		let element = document.querySelectorAll(".canvasjs-chart-container > .canvasjs-chart-canvas")[xxy];
+		elementsList.push(element);
+		element.addEventListener('mousemove', function(evt) {
+			let pos = getMousePos(element, evt);
+			let context = element.getContext("2d");
+			context.beginPath();
+			context.moveTo(pos.x, 0);
+			context.lineTo(pos.x, element.height);
+			context.lineWidth = 1;
+			context.strokeStyle = "#ff0000";
+			context.stroke();
+		});
+		//console.log(element);
+	}
+}
+		</script>
+		{{/forecast}}
+	</div>
+	<div class="footer">
+		NewWeather is open source!
+		<a class="github-button" href="https://github.com/Bananabob999/newweather" data-color-scheme="no-preference: light; light: light; dark: light;" aria-label="View on GitHub">View on GitHub</a></div>
+		<script async defer src="https://buttons.github.io/buttons.js"></script>
+	</body>
+</html>
