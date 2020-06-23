@@ -92,6 +92,10 @@
 				background: rgb(175,175,175);
 				background: linear-gradient(0deg, rgba(226,235,234,1) 0%, rgba(255,255,255,1) 100%);
 			}
+      .githubButton:hover {
+        background: rgb(226,235,234);
+        border-color: #aaa;
+      }
 		</style>
 		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 	</head>
@@ -103,7 +107,7 @@
 			Longitude <input id="long" type="number" value="-78.880290">
 			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value">Get Forecast</button>
 			<button id="autoButton" onclick="getLocation();">Autodetect location</button><br>
-			<a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png">View source code on GitHub</a>
+			<br><a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"> View source code on GitHub</a>
 		</div>
 		<script>
 var xxx = document.getElementById("autoButton");
