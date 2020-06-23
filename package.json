@@ -8,7 +8,7 @@
     "start": "node index.js"
   },
   "author": "Jesse",
-  "license": "ISC",
+  "license": "GNU GPL 3.0",
   "dependencies": {
     "mustache": "^4.0.1",
     "request": "^2.88.2"
