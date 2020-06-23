@@ -103,6 +103,7 @@ function getLocation() {
 	xxx.innerHTML = "Detecting...";
 	yyy.style.background = '#eee';
 	yyy.style.boxShadow = 'none';
+  yyy.style.color = 'grey';
 	yyy.style.cursor = 'default';
 	console.log(window.parent.document.location.protocol);
 	if(window.parent.document.location.protocol === 'http:') {
@@ -122,6 +123,7 @@ function showPosition(position) {
 	yyy.style.boxShadow = '3px 3px 5px lightgrey';
 	yyy.style.cursor = 'pointer';
 	xxx.style.display = 'none';
+  yyy.style.color = 'black';
 	yyy.style.background = 'lightgreen';
 	console.log(position);
 	document.getElementById('lat').value = Math.floor(position.coords.latitude*1000000)/1000000;
