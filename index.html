@@ -121,7 +121,7 @@ function showPosition(position) {
 	yyy.style.background = 'lightgrey';
 	yyy.style.boxShadow = '3px 3px 5px lightgrey';
 	yyy.style.cursor = 'pointer';
-	xxx.innerHTML = "Try again";
+	xxx.style.display = 'none';
 	yyy.style.background = 'lightgreen';
 	console.log(position);
 	document.getElementById('lat').value = Math.floor(position.coords.latitude*1000000)/1000000;
