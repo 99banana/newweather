@@ -31,6 +31,7 @@ function getWeather(latitude, longitude) {
 	let snowFall = "";
 	let thunder = "";
 	let allWeather = "";
+	let cloud = "";
 	let options = {
 		"method": "GET",
 		"url": `https://api.weather.gov/points/${latitude},${longitude}`,
@@ -57,6 +58,9 @@ function getWeather(latitude, longitude) {
 		let r2 = new Request(options, (err, res2) => {
 			if(err) { throw err; }
 			let properties = JSON.parse(res2.body).properties;
+			for(let prop in properties) {
+				console.log(prop);
+			}
 			if(properties === undefined) {
 				weather[latitude+","+longitude] = {
 					failed: true,
@@ -127,12 +131,20 @@ function getWeather(latitude, longitude) {
 					windSpeed+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:${value} },`;
 				}
 			}
-			for(let xyz in properties.probabilityOfThunder.values) {
-				if(properties.probabilityOfThunder.values[xyz]) {
-					let precip = properties.probabilityOfThunder.values[xyz];
+			for(let xyz in properties.lightningActivityLevel.values) {
+				if(properties.lightningActivityLevel.values[xyz]) {
+					let precip = properties.lightningActivityLevel.values[xyz];
 					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
 					let value = Math.floor(precip.value * 10)/10;
 					thunder+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:${value} },`;
+				}
+			}
+			for(let xyz in properties.skyCover.values) {
+				if(properties.skyCover.values[xyz]) {
+					let precip = properties.skyCover.values[xyz];
+					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
+					let value = Math.floor(precip.value * 10)/10;
+					cloud+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:${value} },`;
 				}
 			}
 			for(let xyz in properties.temperature.values) {
@@ -192,9 +204,9 @@ function getWeather(latitude, longitude) {
 					let windSpeedValue = Math.floor(precip.value * 10)/10;
 					
 					precipDatesArray = [];
-					for(let xyz = 0; xyz < properties.probabilityOfThunder.values.length; xyz++) {
-						if(properties.probabilityOfThunder.values[xyz]) {
-							let precip = properties.probabilityOfThunder.values[xyz];
+					for(let xyz = 0; xyz < properties.lightningActivityLevel.values.length; xyz++) {
+						if(properties.lightningActivityLevel.values[xyz]) {
+							let precip = properties.lightningActivityLevel.values[xyz];
 							let precipDate = new Date(precip.validTime.replace(/\/.+/g, ''));
 							precipDatesArray.push(precipDate);
 						}
@@ -205,12 +217,13 @@ function getWeather(latitude, longitude) {
 							return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
 						});
 						indexOf = precipDatesArray.indexOf(closest);
-						precip = properties.probabilityOfThunder.values[indexOf];
+						precip = properties.lightningActivityLevel.values[indexOf];
 					}else {
 						precip = {
 							value:0
 						}
 					}
+					//console.log(properties.lightningActivityLevel.values[indexOf]);
 					let thunderChanceValue = Math.floor(precip.value * 10)/10;
 					
 					precipDatesArray = [];
@@ -233,9 +246,44 @@ function getWeather(latitude, longitude) {
 							value:0
 						}
 					}
-					//console.log(precip);
 					let snowFallValue = precip.value;
-					allWeather+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:0, temperature:${value}, precipChance:${precipValue}, date: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), precipAccum:'${precipAccumValue}', windSpeed:${windSpeedValue}, thunderChance:'${thunderChanceValue}', snowfall:${snowFallValue} },\n`
+					
+					precipDatesArray = [];
+					for(let xyz = 0; xyz < properties.windDirection.values.length; xyz++) {
+						if(properties.windDirection.values[xyz]) {
+							let precip = properties.windDirection.values[xyz];
+							let precipDate = new Date(precip.validTime.replace(/\/.+/g, ''));
+							precipDatesArray.push(precipDate);
+						}
+					}
+					goal = date;
+					if(closest[0] !== undefined) {
+						closest = precipDatesArray.reduce(function(prev, curr) {
+							return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+						});
+						indexOf = precipDatesArray.indexOf(closest);
+						precip = properties.windDirection.values[indexOf];
+					}
+					let windDirValue = properties.windDirection.values[indexOf].value;
+					
+					precipDatesArray = [];
+					for(let xyz = 0; xyz < properties.skyCover.values.length; xyz++) {
+						if(properties.skyCover.values[xyz]) {
+							let precip = properties.skyCover.values[xyz];
+							let precipDate = new Date(precip.validTime.replace(/\/.+/g, ''));
+							precipDatesArray.push(precipDate);
+						}
+					}
+					goal = date;
+					if(closest[0] !== undefined) {
+						closest = precipDatesArray.reduce(function(prev, curr) {
+							return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+						});
+						indexOf = precipDatesArray.indexOf(closest);
+						precip = properties.skyCover.values[indexOf];
+					}
+					let skyCoverValue = properties.skyCover.values[indexOf].value;
+					allWeather+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:0, temperature:${value}, precipChance:${precipValue}, date: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), precipAccum:'${precipAccumValue}', windSpeed:${windSpeedValue}, thunderChance:'${thunderChanceValue}', snowfall:${snowFallValue}, windDirection:${windDirValue}, cloudCover:${skyCoverValue} },\n`
 				}
 			}
 			
@@ -249,6 +297,7 @@ function getWeather(latitude, longitude) {
 				thunder: thunder,
 				allWeather: allWeather,
 				snowFall: snowFall,
+				cloud: cloud,
 				timer: Date.now() + 1200000
 			}
 			console.log("Weather gotten!");
@@ -294,7 +343,8 @@ let server = http.createServer(function (request, response) {
 				windSpeed: forecast.windSpeed,
 				thunder: forecast.thunder,
 				allWeather: forecast.allWeather,
-				snowFall: forecast.snowFall
+				snowFall: forecast.snowFall,
+				cloud: forecast.cloud
 			});
 		}
 	}else if(request.url.startsWith('/resource/')) {
