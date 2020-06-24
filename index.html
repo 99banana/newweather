@@ -224,13 +224,16 @@ var chart = new CanvasJS.Chart("chartContainer2", {
 					let months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 					let day = days[point.x.getDay()];
 					let month = months[point.x.getMonth()];
-					let hours = point.x.getHours() + 1;
+					let hours = point.x.getHours();
 					let apm = "AM";
 					if(hours > 11 && hours < 24) {
 						apm = "PM";
 					}
 					if(hours > 12) {
 						hours-=12;
+					}
+					if(hours == 0) {
+						hours = 12;
 					}
 					console.log(point.x);
 					console.log(point.date);
