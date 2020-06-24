@@ -225,17 +225,19 @@ var chart = new CanvasJS.Chart("chartContainer2", {
 					let day = days[point.x.getDay()];
 					let month = months[point.x.getMonth()];
 					let hours = point.x.getHours() + 1;
-					let apm = "PM";
+					let apm = "AM";
+					if(hours > 11 && hours < 24) {
+						apm = "PM";
+					}
 					if(hours > 12) {
 						hours-=12;
-					}else { apm = "AM"; }
-					
+					}
+					console.log(point.x);
+					console.log(point.date);
 					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
 					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:darkred;'>Temperature:</b> "+Math.floor(point.temperature)+" F<br><b style='color:blue;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:blue;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:darkred;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:darkred;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
 					return content;
 				}
-				/*content += e.entries[i].dataSeries.name + " " + "<strong>" + e.entries[i].dataPoint.y + "</strong>";
-				content += "<br/>";*/
 			}
 			content+= "No precise data<br> for this time.";
 			return content;
@@ -321,9 +323,7 @@ var chart1 = new CanvasJS.Chart("chartContainer1", {
 		contentFormatter: function (e) {
 			let content = " ";
 			for (let i = 0; i < e.entries.length; i++) {
-				
 				let point = e.entries[i].dataPoint;
-				
 				if(point.precipChance !== undefined) {
 					//console.log(point);
 					let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -338,7 +338,6 @@ var chart1 = new CanvasJS.Chart("chartContainer1", {
 					if(hours > 12) {
 						hours-=12;
 					}
-					
 					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
 					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:blue;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:darkred;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:darkred;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
 					
