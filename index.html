@@ -107,7 +107,7 @@
 			Longitude <input id="long" type="number" value="-78.880290">
 			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value">Get Forecast</button>
 			<button id="autoButton" onclick="getLocation();">Autodetect location</button><br>
-			<br><a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"> View source code on GitHub</a>
+			<br><a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/image/png/GitHub-Mark-64px.png"> View source code on GitHub</a>
 		</div>
 		<script>
 var xxx = document.getElementById("autoButton");
@@ -235,8 +235,8 @@ var chart = new CanvasJS.Chart("chartContainer2", {
 					if(hours == 0) {
 						hours = 12;
 					}
-					console.log(point.x);
-					console.log(point.date);
+					//console.log(point.x);
+					//console.log(point.date);
 					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
 					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:darkred;'>Temperature:</b> "+Math.floor(point.temperature)+" F<br><b style='color:blue;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:blue;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:darkred;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:darkred;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
 					return content;

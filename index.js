@@ -347,10 +347,9 @@ let server = http.createServer(function (request, response) {
 				cloud: forecast.cloud
 			});
 		}
-	}else if(request.url.startsWith('/resource/')) {
-		response.writeHead(200, {'Content-Type': 'text/html'});
-		console.log(request.url.replace('/resource', ''));
-		fs.readFile('.'+request.url.replace('/resource', '/'), 'utf8', function(err, data) {
+	}else if(request.url.startsWith('/image/png/')) {
+		response.writeHead(200, {'Content-Type': 'image'});
+		fs.readFile('.'+request.url.replace('/image/png', '/'), 'utf8', function(err, data) {
 			if (!err) {
 				response.end(data);
 			}else {
