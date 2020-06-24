@@ -6,8 +6,7 @@
 			body {
 				font-family:Arial, sans-serif;
 				padding:50px;
-				padding-bottom:0px;
-				margin-bottom:0px;
+				padding-bottom:50px;
 				position:relative;
 			}
 			p, div {
@@ -41,8 +40,9 @@
 				width:100%;
 			}
 			td {
-				text-align:center;
-				padding:3px;
+				text-align:left;
+				padding:15px;
+				padding-left:30px;
 			}
 			tr:nth-child(even) {background-color: #f2f2f2;}
 			tr:hover {
@@ -52,6 +52,9 @@
 				padding:10px;
 				font-size:1.2em;
 				background-color:#ddd;
+				min-width:150px;
+				text-align:left;
+				padding-left:30px;
 			}
 			.header {
 				z-index:199;
@@ -107,7 +110,7 @@
 			Longitude <input id="long" type="number" value="-78.880290">
 			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value">Get Forecast</button>
 			<button id="autoButton" onclick="getLocation();">Autodetect location</button><br>
-			<br><a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/image/png/GitHub-Mark-64px.png"> View source code on GitHub</a>
+			<br><a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
 		</div>
 		<script>
 		
@@ -173,11 +176,10 @@ function showPosition(position) {
 			<br>
 			<table>
 				<tr>
-					<th>Time</th><th>Temperature</th><th>Wind</th><th>Description</th><th>Image</th>
+					<th>Time</th><th>Temperature</th><th>Description</th>
 				</tr>
-				{{&sevenDay.details}}
+				{{ &sevenDay.table }}
 			</table>
-			Oops! Table data is not available yet!
 		</div>
 		<script>
 		

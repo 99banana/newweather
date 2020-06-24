@@ -2,6 +2,7 @@
 'use strict';
 const http = require('http');
 const https = require('https');
+const Static = require('node-static');
 const fs = require('fs');
 const Request = require('request');
 const Mustache = require('mustache');
@@ -22,7 +23,7 @@ function send(response, values) {
 	});
 }
 let weather = {};
-function getWeather(latitude, longitude) {
+async function getWeather(latitude, longitude) {
 	let precipitation = "";
 	let precipitationTotal = "";
 	let temperature = "";
@@ -65,21 +66,6 @@ function getWeather(latitude, longitude) {
 				}
 				return;
 			}
-			//console.log(properties);
-		/* +console.log(JSON.parse(res2.body).properties.probabilityOfPrecipitation);
-		   +console.log(JSON.parse(res2.body).properties.probabilityOfThunder);
-		    console.log(JSON.parse(res2.body).properties.hazards);
-		    console.log(JSON.parse(res2.body).properties.quantitativePrecipitation);
-		    console.log(JSON.parse(res2.body).properties.temperature);
-		    console.log(JSON.parse(res2.body).properties.windSpeed);
-		    console.log(JSON.parse(res2.body).properties.windDirection);
-		    console.log(JSON.parse(res2.body).properties.windGust);
-		    console.log(JSON.parse(res2.body).properties.iceAccumulation);
-		    console.log(JSON.parse(res2.body).properties.snowfallAmount);
-		    console.log(JSON.parse(res2.body).properties.snowLevel);
-		    console.log(JSON.parse(res2.body).properties.visibility);
-		    console.log(JSON.parse(res2.body).properties.pressure);
-		*/
 			for(let xyz in properties.probabilityOfPrecipitation.values) {
 				if(properties.probabilityOfPrecipitation.values[xyz]) {
 					let precip = properties.probabilityOfPrecipitation.values[xyz];
@@ -254,7 +240,7 @@ function getWeather(latitude, longitude) {
 						}
 					}
 					goal = date;
-					if(closest[0] !== undefined) {
+					if(precipDatesArray[0] !== undefined) {
 						closest = precipDatesArray.reduce(function(prev, curr) {
 							return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
 						});
@@ -272,37 +258,67 @@ function getWeather(latitude, longitude) {
 						}
 					}
 					goal = date;
-					if(closest[0] !== undefined) {
+					if(precipDatesArray[0] !== undefined) {
 						closest = precipDatesArray.reduce(function(prev, curr) {
 							return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
 						});
 						indexOf = precipDatesArray.indexOf(closest);
-						precip = properties.skyCover.values[indexOf];
 					}
 					let skyCoverValue = properties.skyCover.values[indexOf].value;
+					//console.log(indexOf+'-'+(Date.parse(goal)-Date.parse(precip.validTime.replace(/\/.+/g, '')))/1000/60);
+					if(skyCoverValue == 80) console.log('---------------------------');
 					allWeather+=`{ x: new Date(${date.getTime()}), y:0, temperature:${value}, precipChance:${precipValue}, date: new Date(${date.getTime()}), precipAccum:'${precipAccumValue}', windSpeed:${windSpeedValue}, thunderChance:'${thunderChanceValue}', snowfall:${snowFallValue}, windDirection:${windDirValue}, cloudCover:${skyCoverValue} },\n`
 				}
 			}
 			
-			//console.log(precipitationTotal);
-			weather[latitude+","+longitude] = {
-				precipitation: precipitation,
-				precipitationTotal: precipitationTotal,
-				temperature: temperature,
-				dailyTable: dailyTable,
-				windSpeed: windSpeed,
-				thunder: thunder,
-				allWeather: allWeather,
-				snowFall: snowFall,
-				cloud: cloud,
-				timer: Date.now() + 1200000
-			}
-			console.log("Weather gotten!");
+			options = {
+				"method": "GET",
+				"url": body.properties.forecast,
+				"headers": { "User-Agent": "node.js v14.4.0 (contact: gjkreider69@gmail.com)", "Accept": "application/geo+json" }
+			};
+			let table = "";
+			let today = ""
+			let r2 = new Request(options, (err, res2) => {
+				if(err) { throw err; }
+				let properties = JSON.parse(res2.body).properties;
+				if(properties === undefined) {
+					weather[latitude+","+longitude] = {
+						failed: true,
+						timer: Date.now() + 20000
+					}
+					return;
+				}
+				for(let period in properties.periods) {
+					period = properties.periods[period];
+					table+=`<tr><td>${period.name}</td><td>${period.temperature}</td><td>${period.detailedForecast}</td></tr>`;
+				}
+				today = `${properties.periods[0].name}: ${properties.periods[0].shortForecast}`;
+				
+				weather[latitude+","+longitude] = {
+					precipitation: precipitation,
+					precipitationTotal: precipitationTotal,
+					temperature: temperature,
+					dailyTable: dailyTable,
+					windSpeed: windSpeed,
+					thunder: thunder,
+					allWeather: allWeather,
+					snowFall: snowFall,
+					cloud: cloud,
+					table: {
+						today: today,
+						table: table
+					},
+					timer: Date.now() + 1200000
+				}
+				console.log("Weather gotten!");
+				
+			});
 		});
 	});
 }
 getWeather(38.466630, -78.880290);
 
+var StaticServer = new(Static.Server)();
 let server = http.createServer(function (request, response) {
 	if(request.url.startsWith('/forecast/')) {
 		let longitude = request.url.split('/')[3];
@@ -341,18 +357,16 @@ let server = http.createServer(function (request, response) {
 				thunder: forecast.thunder,
 				allWeather: forecast.allWeather,
 				snowFall: forecast.snowFall,
-				cloud: forecast.cloud
+				cloud: forecast.cloud,
+				sevenDay: {
+					table: forecast.table.table,
+					today: forecast.table.today
+				}
 			});
 		}
-	}else if(request.url.startsWith('/image/png/')) {
-		response.writeHead(200, {'Content-Type': 'image'});
-		fs.readFile('.'+request.url.replace('/image/png', '/'), 'utf8', function(err, data) {
-			if (!err) {
-				response.end(data);
-			}else {
-				console.log(err);
-			}
-		});
+	}else if(request.url.startsWith('/static/')) {
+		request.url = request.url.replace('/static/', '/');
+		StaticServer.serve(request, response);
 	}else {
 		let values = {};
 		response.writeHead(200, {'Content-Type': 'text/html'});
