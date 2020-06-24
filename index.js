@@ -85,7 +85,7 @@ function getWeather(latitude, longitude) {
 					let precip = properties.probabilityOfPrecipitation.values[xyz];
 					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
 					let value = Math.floor(precip.value * 10)/10;
-					precipitation+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:${value} },\n`;
+					precipitation+=`{ x: new Date(${date.getTime()}), y:${value} },\n`;
 
 				}
 			}
@@ -94,7 +94,7 @@ function getWeather(latitude, longitude) {
 					let precip = properties.snowfallAmount.values[xyz];
 					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
 					let value = Math.floor(precip.value * 10)/10;
-					snowFall+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:${value} },\n`;
+					snowFall+=`{ x: new Date(${date.getTime()}), y:${value} },\n`;
 
 				}
 			}
@@ -103,7 +103,7 @@ function getWeather(latitude, longitude) {
 					let precip = properties.quantitativePrecipitation.values[xyz];
 					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
 					let value = Math.floor(precip.value * 10)/10;
-					precipitationTotal+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:${value} },`;
+					precipitationTotal+=`{ x: new Date(${date.getTime()}), y:${value} },`;
 				}
 			}
 			for(let xyz in properties.temperature.values) {
@@ -114,7 +114,7 @@ function getWeather(latitude, longitude) {
 					if(properties.temperature.uom === 'wmoUnit:degC') {
 						value = value*1.8+32;
 					}
-					temperature+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:${value} },`;
+					temperature+=`{ x: new Date(${date.getTime()}), y:${value} },`;
 				}
 			}
 			for(let xyz in properties.windSpeed.values) {
@@ -125,7 +125,7 @@ function getWeather(latitude, longitude) {
 					//if(properties.windSpeed.uom === 'wmoUnit:km_h-1') {
 					//	value = (value+1) * 1.60934;
 					//}
-					windSpeed+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:${value} },`;
+					windSpeed+=`{ x: new Date(${date.getTime()}), y:${value} },`;
 				}
 			}
 			for(let xyz in properties.lightningActivityLevel.values) {
@@ -133,7 +133,7 @@ function getWeather(latitude, longitude) {
 					let precip = properties.lightningActivityLevel.values[xyz];
 					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
 					let value = Math.floor(precip.value * 10)/10;
-					thunder+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:${value} },`;
+					thunder+=`{ x: new Date(${date.getTime()}), y:${value} },`;
 				}
 			}
 			for(let xyz in properties.skyCover.values) {
@@ -141,7 +141,7 @@ function getWeather(latitude, longitude) {
 					let precip = properties.skyCover.values[xyz];
 					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
 					let value = Math.floor(precip.value * 10)/10;
-					cloud+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:${value} },`;
+					cloud+=`{ x: new Date(${date.getTime()}), y:${value} },`;
 				}
 			}
 			for(let xyz in properties.temperature.values) {
