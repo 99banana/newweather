@@ -58,9 +58,6 @@ function getWeather(latitude, longitude) {
 		let r2 = new Request(options, (err, res2) => {
 			if(err) { throw err; }
 			let properties = JSON.parse(res2.body).properties;
-			for(let prop in properties) {
-				console.log(prop);
-			}
 			if(properties === undefined) {
 				weather[latitude+","+longitude] = {
 					failed: true,
@@ -283,7 +280,7 @@ function getWeather(latitude, longitude) {
 						precip = properties.skyCover.values[indexOf];
 					}
 					let skyCoverValue = properties.skyCover.values[indexOf].value;
-					allWeather+=`{ x: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), y:0, temperature:${value}, precipChance:${precipValue}, date: new Date(${date.getFullYear()}, ${date.getMonth()}, ${date.getDate()}, ${date.getHours()}), precipAccum:'${precipAccumValue}', windSpeed:${windSpeedValue}, thunderChance:'${thunderChanceValue}', snowfall:${snowFallValue}, windDirection:${windDirValue}, cloudCover:${skyCoverValue} },\n`
+					allWeather+=`{ x: new Date(${date.getTime()}), y:0, temperature:${value}, precipChance:${precipValue}, date: new Date(${date.getTime()}), precipAccum:'${precipAccumValue}', windSpeed:${windSpeedValue}, thunderChance:'${thunderChanceValue}', snowfall:${snowFallValue}, windDirection:${windDirValue}, cloudCover:${skyCoverValue} },\n`
 				}
 			}
 			
