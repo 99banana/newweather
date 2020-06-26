@@ -2,12 +2,19 @@
 	<head>
 		<title>Weather ... ?</title>
 		<meta charset="utf-8">
+		<link rel="icon" href="/static/icon.png">
 		<style>
 			body {
 				font-family:Arial, sans-serif;
 				padding:50px;
 				padding-bottom:50px;
 				position:relative;
+				background:white;
+				color:black;
+				{{#theme}}
+					background:#2a2a2a;
+					color:white;
+				{{/theme}}
 			}
 			p, div {
 				font-size:1em;
@@ -15,18 +22,28 @@
 			input {
 				padding:5px;
 				border:1px transparent;
-				background:white;
-				box-shadow:3px 3px 5px lightgrey;
+				background:#ddd;
+				box-shadow:3px 3px 5px #ddd;
 				font-size:1em;
+				{{#theme}}
+					background:#444;
+					color:white;
+					box-shadow:3px 3px 5px #222;
+				{{/theme}}
 			}
 			button {
 				padding:8px;
 				border:1px transparent;
 				font-size:1.1em;
 				font-weight:bold;
-				background:lightgrey;
-				box-shadow:3px 3px 5px lightgrey;
+				background:#ddd;
+				box-shadow:3px 3px 5px #ddd;
 				cursor:pointer;
+				{{#theme}}
+					background:#444;
+					color:white;
+					box-shadow:3px 3px 5px #222;
+				{{/theme}}
 			}
 			.form {
 				padding:5px;
@@ -45,8 +62,14 @@
 				padding-left:30px;
 			}
 			tr:nth-child(even) {background-color: #f2f2f2;}
+			{{#theme}}
+				tr:nth-child(even) {background-color: #444;}
+			{{/theme}}
 			tr:hover {
 				background-color: #ddd;
+				{{#theme}}
+					background-color:#222;
+				{{/theme}}
 			}
 			th {
 				padding:10px;
@@ -55,10 +78,13 @@
 				min-width:150px;
 				text-align:left;
 				padding-left:30px;
+				{{#theme}}
+					background-color:#222;
+				{{/theme}}
 			}
 			.header {
 				z-index:199;
-				background:white;
+				background:transparent;
 				padding:10px;
 				margin:0px;
 				overflow:auto;
@@ -95,10 +121,23 @@
 				background: rgb(175,175,175);
 				background: linear-gradient(0deg, rgba(226,235,234,1) 0%, rgba(255,255,255,1) 100%);
 			}
-      .githubButton:hover {
-        background: rgb(226,235,234);
-        border-color: #aaa;
-      }
+			.githubButton:hover {
+				background: rgb(226,235,234);
+				border-color: #aaa;
+			}
+			.githubButtonDark {
+				color:white;
+				text-decoration:none;
+				border: 1px solid #777;
+				border-radius:3px;
+				padding:3px 7px;
+				background: rgb(0,0,0);
+				background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(73,73,73,1) 100%);
+			}
+			.githubButtonDark:hover {
+				background: rgb(73,73,73);
+				border-color: #555;
+			}
 		</style>
 		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 	</head>
@@ -108,9 +147,11 @@
 		<div class="form">
 			Latitude <input id="lat" type="number" value="38.466630">
 			Longitude <input id="long" type="number" value="-78.880290">
-			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value">Get Forecast</button>
+			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/true'{{/theme}}">Get Forecast</button>
 			<button id="autoButton" onclick="getLocation();">Autodetect location</button><br>
 			<br><a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
+			{{^theme}}<a class="githubButtonDark" onclick="window.location.href=window.location.href+'/true'" href="#" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/icon.png"> Dark theme</a>{{/theme}}
+			{{#theme}}<a class="githubButtonDark" onclick="window.location.href=window.location.href.replace('/true', '')" href="#" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/icon.png"> Light theme</a>{{/theme}}
 		</div>
 		<script>
 		
@@ -205,7 +246,12 @@ var chart = new CanvasJS.Chart("chartContainer2", {
 	title:{
 		text: "7-day Forecast"
 	},
-	theme: 'light2',
+	{{^theme}}
+	theme: 'light1',
+	{{/theme}}
+	{{#theme}}
+	theme: 'dark1',
+	{{/theme}}
 	axisY: {
 		includeZero: false,
 		suffix: "",
@@ -219,8 +265,39 @@ var chart = new CanvasJS.Chart("chartContainer2", {
 	toolTip:{
 		shared: true,
 		borderColor: "#2E8B57",
+		{{^theme}}
+		backgroundColor: 'light1',
+		{{/theme}}
+		{{#theme}}
+		backgroundColor: '#333',
+		{{/theme}}
 		contentFormatter: function (e) {
 			let content = " ";
+			for (let i = 0; i < e.entries.length; i++) {
+				let point = e.entries[i].dataPoint;
+				if(point.precipChance !== undefined) {
+					let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+					let months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+					let day = days[point.x.getDay()];
+					let month = months[point.x.getMonth()];
+					let hours = point.x.getHours();
+					let apm = "AM";
+					if(hours > 11 && hours < 24) {
+						apm = "PM";
+					}
+					if(hours > 12) {
+						hours-=12;
+					}
+					if(hours == 0) {
+						hours = 12;
+					}
+					//console.log(point.x);
+					//console.log(point.date);
+					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:darkred;'>Temperature:</b> "+Math.floor(point.temperature)+" F<br><b style='color:#2288ff;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:darkred;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:darkred;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
+					return content;
+				}
+			}
 			for (let i = 0; i < e.entries.length; i++) {
 				let point = e.entries[i].dataPoint;
 				if(point.precipChance !== undefined) {
@@ -313,7 +390,12 @@ var chart1 = new CanvasJS.Chart("chartContainer1", {
 	title:{
 		text: ""
 	},
-	theme: 'light2',
+	{{^theme}}
+	theme: 'light1',
+	{{/theme}}
+	{{#theme}}
+	theme: 'dark1',
+	{{/theme}}
 	axisY: {
 		includeZero: false,
 		suffix: "",
@@ -324,7 +406,13 @@ var chart1 = new CanvasJS.Chart("chartContainer1", {
 		gridThickness: 1,
 		gridColor: 'lightgrey'
 	},
-	toolTip:{
+	toolTip: {
+		{{^theme}}
+		backgroundColor: 'light1',
+		{{/theme}}
+		{{#theme}}
+		backgroundColor: '#333',
+		{{/theme}}
 		shared: true,
 		borderColor: "#2E8B57",
 		contentFormatter: function (e) {
@@ -346,7 +434,7 @@ var chart1 = new CanvasJS.Chart("chartContainer1", {
 						hours-=12;
 					}
 					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
-					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:blue;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:darkred;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:darkred;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:darkred;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:darkred;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
 					
 					return content;
 				}
