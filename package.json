@@ -11,6 +11,7 @@
   "license": "GNU GPL 3.0",
   "dependencies": {
     "mustache": "^4.0.1",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "node-static": "^0.7.11"
   }
 }
