@@ -294,32 +294,7 @@ var chart = new CanvasJS.Chart("chartContainer2", {
 					//console.log(point.x);
 					//console.log(point.date);
 					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
-					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:darkred;'>Temperature:</b> "+Math.floor(point.temperature)+" F<br><b style='color:#2288ff;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:darkred;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:darkred;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
-					return content;
-				}
-			}
-			for (let i = 0; i < e.entries.length; i++) {
-				let point = e.entries[i].dataPoint;
-				if(point.precipChance !== undefined) {
-					let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-					let months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-					let day = days[point.x.getDay()];
-					let month = months[point.x.getMonth()];
-					let hours = point.x.getHours();
-					let apm = "AM";
-					if(hours > 11 && hours < 24) {
-						apm = "PM";
-					}
-					if(hours > 12) {
-						hours-=12;
-					}
-					if(hours == 0) {
-						hours = 12;
-					}
-					//console.log(point.x);
-					//console.log(point.date);
-					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
-					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:darkred;'>Temperature:</b> "+Math.floor(point.temperature)+" F<br><b style='color:blue;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:blue;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:darkred;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:darkred;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#ff3030;'>Temperature:</b> "+Math.floor(point.temperature)+" F<br><b style='color:#2288ff;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:#ff3030;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:#ff3030;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
 					return content;
 				}
 			}
@@ -434,7 +409,7 @@ var chart1 = new CanvasJS.Chart("chartContainer1", {
 						hours-=12;
 					}
 					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
-					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:darkred;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:darkred;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:#ff3030;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:#ff3030;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
 					
 					return content;
 				}
