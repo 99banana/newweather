@@ -323,19 +323,22 @@ let server = http.createServer(function (request, response) {
 	if(request.url.startsWith('/forecast/')) {
 		let longitude = request.url.split('/')[3];
 		let latitude = request.url.split('/')[2];
+		let theme = request.url.split('/')[4];
 		let forecast = weather[latitude+","+longitude];
 		if(forecast === undefined || forecast.timer < Date.now()) {
 			getWeather(latitude, longitude);
 			send(response, {
 				forecast: false,
-				refresh: true
+				refresh: true,
+				theme:theme
 			});
 		}else if(forecast.failed === true) {
 			if(forecast.timer < Date.now()) {
 				getWeather(latitude, longitude);
 				send(response, {
 					forecast: false,
-					refresh: true
+					refresh: true,
+					theme:theme
 				});
 			}else {
 				send(response, {
@@ -343,7 +346,8 @@ let server = http.createServer(function (request, response) {
 					refresh: false,
 					error: true,
 					latitude: latitude,
-					longitude: longitude
+					longitude: longitude,
+					theme:theme
 				});
 			}
 		}else {
@@ -361,7 +365,8 @@ let server = http.createServer(function (request, response) {
 				sevenDay: {
 					table: forecast.table.table,
 					today: forecast.table.today
-				}
+				},
+				theme:theme
 			});
 		}
 	}else if(request.url.startsWith('/static/')) {
