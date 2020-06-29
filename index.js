@@ -380,5 +380,5 @@ let server = http.createServer(function (request, response) {
 			response.end(Mustache.render(data, values));
 		});
 	}
-}).listen(process.env.PORT);
+}).listen(process.env.PORT, process.env.IPADDR);
 console.log('Server running!');
