@@ -7,6 +7,9 @@ const fs = require('fs');
 const Request = require('request');
 const Mustache = require('mustache');
 
+const PORT  = process.env.PORT || 80;
+const IPADDR = process.env.IPADDR || "127.0.0.1";
+
 let options = {
 	"method": "GET",
 	"url": "https://api.weather.gov/points/38.466630,-78.880290",
@@ -280,6 +283,7 @@ async function getWeather(latitude, longitude) {
 			let today = ""
 			let r2 = new Request(options, (err, res2) => {
 				if(err) { throw err; }
+				//console.log(res2.body);
 				let properties = JSON.parse(res2.body).properties;
 				if(properties === undefined) {
 					weather[latitude+","+longitude] = {
@@ -320,10 +324,13 @@ getWeather(38.466630, -78.880290);
 
 var StaticServer = new(Static.Server)();
 let server = http.createServer(function (request, response) {
+	let theme = false;
+	if(request.url.endsWith('/true')) {
+		theme = true;
+	}
 	if(request.url.startsWith('/forecast/')) {
 		let longitude = request.url.split('/')[3];
 		let latitude = request.url.split('/')[2];
-		let theme = request.url.split('/')[4];
 		let forecast = weather[latitude+","+longitude];
 		if(forecast === undefined || forecast.timer < Date.now()) {
 			getWeather(latitude, longitude);
@@ -373,12 +380,12 @@ let server = http.createServer(function (request, response) {
 		request.url = request.url.replace('/static/', '/');
 		StaticServer.serve(request, response);
 	}else {
-		let values = {};
+		let values = {theme:theme};
 		response.writeHead(200, {'Content-Type': 'text/html'});
 		fs.readFile('./index.html', 'utf8', function(err, data) {
 			if (err) { throw err; }
 			response.end(Mustache.render(data, values));
 		});
 	}
-}).listen(process.env.PORT, process.env.IPADDR);
-console.log('Server running!');
+}).listen(PORT, IPADDR);
+console.log('Server running! PORT:'+PORT+' IPADDR:'+IPADDR);
