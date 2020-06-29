@@ -324,9 +324,9 @@ getWeather(38.466630, -78.880290);
 
 var StaticServer = new(Static.Server)();
 let server = http.createServer(function (request, response) {
-	let theme = false;
-	if(request.url.endsWith('/true')) {
-		theme = true;
+	let theme = '';
+	if(request.url.endsWith('/dark')) {
+		theme = 'dark';
 	}
 	if(request.url.startsWith('/forecast/')) {
 		let longitude = request.url.split('/')[3];
@@ -360,6 +360,7 @@ let server = http.createServer(function (request, response) {
 		}else {
 			send(response, {
 				forecast: true,
+				refresh: false,
 				precipitation: forecast.precipitation,
 				precipitationTotal: forecast.precipitationTotal,
 				temperature: forecast.temperature,
@@ -379,8 +380,15 @@ let server = http.createServer(function (request, response) {
 	}else if(request.url.startsWith('/static/')) {
 		request.url = request.url.replace('/static/', '/');
 		StaticServer.serve(request, response);
+	}else if(request.url.startsWith('/data')) {
+		let values = {theme:theme, refresh:false, data:true};
+		response.writeHead(200, {'Content-Type': 'text/html'});
+		fs.readFile('./index.html', 'utf8', function(err, data) {
+			if (err) { throw err; }
+			response.end(Mustache.render(data, values));
+		});
 	}else {
-		let values = {theme:theme};
+		let values = {theme:theme, refresh:false};
 		response.writeHead(200, {'Content-Type': 'text/html'});
 		fs.readFile('./index.html', 'utf8', function(err, data) {
 			if (err) { throw err; }

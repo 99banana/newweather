@@ -145,13 +145,20 @@
 	<div class="header">
 		<h2 style="padding:2px; margin:2px;" >Select location:</h2>
 		<div class="form">
+			{{^latitude}}
 			Latitude <input id="lat" type="number" value="38.466630">
 			Longitude <input id="long" type="number" value="-78.880290">
-			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/true'{{/theme}}">Get Forecast</button>
+			{{/latitude}}
+			{{#latitude}}
+			Latitude <input id="lat" type="number" value="{{latitude}}">
+			Longitude <input id="long" type="number" value="{{longitude}}">
+			{{/latitude}}
+			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/dark'{{/theme}}">Get Forecast</button>
 			<button id="autoButton" onclick="getLocation();">Autodetect location</button><br>
-			<br><a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
-			{{^theme}}<a class="githubButtonDark" onclick="window.location.href=window.location.href+'/true'" href="#" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/icon.png"> Dark theme</a>{{/theme}}
-			{{#theme}}<a class="githubButtonDark" onclick="window.location.href=window.location.href.replace('/true', '')" href="#" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/icon.png"> Light theme</a>{{/theme}}
+			<br>{{^refresh}}<a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
+			{{^theme}}<a class="githubButtonDark" onclick="window.location.href=window.location.href+'/dark'" href="#" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/icon.png"> Dark theme</a>{{/theme}}
+			{{#theme}}<a class="githubButtonDark" onclick="window.location.href=window.location.href.replace('/dark', '')" href="#" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/icon.png"> Light theme</a>{{/theme}}
+			{{/refresh}}
 		</div>
 		<script>
 		
@@ -521,5 +528,23 @@ for(let xxy = 0; xxy < document.querySelectorAll(".canvasjs-chart-container > .c
 		</script>
 		{{/forecast}}
 		<script async defer src="https://buttons.github.io/buttons.js"></script>
+		
+		{{#data}}
+			<h3>Data use</h3>
+			<p style="text-align:left; font-size:1.1em;">
+			NOTE: For the purpose of this page, location data includes the weather data associated with said location data.
+			<br><br><b>Data Collection</b><br>
+			Location data is collected in order to get the appropriate forcast for your area.
+			No other data (e.g. device type)
+			<br><br><b>Data Storage</b><br>
+			Location data is saved only temporarily, in order to not have to load the data every time a page is requested.<br>
+			Data for each location expires every 2-3 hours in order to keep forecasts updated. After data for a location expires, it will not be updated until the weather for that location is requested again.
+			Data is deleted each time the server restarts.
+			<br><br><b>Cookies</b><br>
+			This site does not use cookies.
+			</p>
+		{{/data}}
+		<br><br>
+		<a class="githubButton" onclick="window.location.href='/data'{{#theme}}+'/dark'{{/theme}}" href="#" aria-label="Data collection information">Data use/storage information</a>
 	</body>
 </html>
