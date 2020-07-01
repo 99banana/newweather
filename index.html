@@ -6,6 +6,7 @@
 		<style>
 			body {
 				font-family:Arial, sans-serif;
+				top: 70px;
 				padding:50px;
 				padding-bottom:50px;
 				position:relative;
@@ -23,26 +24,38 @@
 				padding:5px;
 				border:1px transparent;
 				background:#ddd;
-				box-shadow:3px 3px 5px #ddd;
+				box-shadow:3px 3px 5px #aaa;
 				font-size:1em;
+				border-radius:4px;
 				{{#theme}}
 					background:#444;
 					color:white;
-					box-shadow:3px 3px 5px #222;
+					box-shadow:3px 3px 5px #111;
 				{{/theme}}
 			}
 			button {
-				padding:8px;
+				font-family:arial;
+				padding:6px;
 				border:1px transparent;
-				font-size:1.1em;
-				font-weight:bold;
 				background:#ddd;
-				box-shadow:3px 3px 5px #ddd;
+				box-shadow:3px 3px 5px #aaa;
+				font-size:1em;
 				cursor:pointer;
+				font-weight:bold;
+				border-radius:4px;
 				{{#theme}}
 					background:#444;
 					color:white;
-					box-shadow:3px 3px 5px #222;
+					box-shadow:3px 3px 5px #111;
+				{{/theme}}
+			}
+			.buttonDark {
+				color:white;
+				cursor:pointer;
+				background:#444;
+				{{#theme}}
+					background:#ddd;
+					color:black;
 				{{/theme}}
 			}
 			.form {
@@ -83,11 +96,23 @@
 				{{/theme}}
 			}
 			.header {
-				z-index:199;
+				position:fixed;
+				z-index:9;
 				background:transparent;
-				padding:10px;
-				margin:0px;
+				padding:20px;
+				background-color:#fff;
+				box-shadow:3px 3px 5px #ddd;
+				{{#theme}}
+					background-color:#2a2a2a;
+					box-shadow:3px 3px 5px #111;
+				{{/theme}}
 				overflow:auto;
+				top:0;
+				left:50px;
+				right:50px;
+				overflow:auto;
+				border-bottom-left-radius: 50% 80%;
+				border-bottom-right-radius:50% 80%;
 			}
 			#floatdiv {
 				position:fixed;
@@ -125,25 +150,12 @@
 				background: rgb(226,235,234);
 				border-color: #aaa;
 			}
-			.githubButtonDark {
-				color:white;
-				text-decoration:none;
-				border: 1px solid #777;
-				border-radius:3px;
-				padding:3px 7px;
-				background: rgb(0,0,0);
-				background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(73,73,73,1) 100%);
-			}
-			.githubButtonDark:hover {
-				background: rgb(73,73,73);
-				border-color: #555;
-			}
 		</style>
 		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 	</head>
 	<body>
 	<div class="header">
-		<h2 style="padding:2px; margin:2px;" >Select location:</h2>
+		<h3 style="padding:2px; margin:2px;" >Enter Location:</h3>
 		<div class="form">
 			{{^latitude}}
 			Latitude <input id="lat" type="number" value="38.466630">
@@ -154,10 +166,11 @@
 			Longitude <input id="long" type="number" value="{{longitude}}">
 			{{/latitude}}
 			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/dark'{{/theme}}">Get Forecast</button>
-			<button id="autoButton" onclick="getLocation();">Autodetect location</button><br>
-			<br>{{^refresh}}<a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
-			{{^theme}}<a class="githubButtonDark" onclick="window.location.href=window.location.href+'/dark'" href="#" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/icon.png"> Dark theme</a>{{/theme}}
-			{{#theme}}<a class="githubButtonDark" onclick="window.location.href=window.location.href.replace('/dark', '')" href="#" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:22px;" src="/static/icon.png"> Light theme</a>{{/theme}}
+			<button id="autoButton" onclick="getLocation();">Detect location</button>
+			{{^refresh}}
+			{{^theme}}<button class="buttonDark" onclick="window.location.href=window.location.href+'/dark'" aria-label="Dark theme"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Dark theme</button>{{/theme}}
+			{{#theme}}<button class="buttonDark" onclick="window.location.href=window.location.href.replace('/dark', '')" aria-label="Light theme"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Light theme</button>{{/theme}}
+			<br>
 			{{/refresh}}
 		</div>
 		<script>
@@ -166,17 +179,11 @@ var xxx = document.getElementById("autoButton");
 var yyy = document.getElementById("forecastButton");
 function getLocation() {
 	xxx.innerHTML = "Detecting...";
-	yyy.style.background = '#eee';
-	yyy.style.boxShadow = 'none';
-  yyy.style.color = 'grey';
-	yyy.style.cursor = 'default';
+	yyy.style.display = 'none';
 	console.log(window.parent.document.location.protocol);
 	if(window.parent.document.location.protocol === 'http:') {
-		yyy.style.background = 'lightgrey';
-		yyy.style.boxShadow = '3px 3px 5px lightgrey';
-		yyy.style.cursor = 'pointer';
 		xxx.innerHTML = "Error";
-		yyy.style.background = 'lightgrey';
+		yyy.style.display = 'inline';
 		alert("Oops. Autodetecting location is only available on a secure connection.");
 	}else {
 		navigator.geolocation.getCurrentPosition(showPosition);
@@ -184,42 +191,42 @@ function getLocation() {
 }
 
 function showPosition(position) {
-	yyy.style.background = 'lightgrey';
-	yyy.style.boxShadow = '3px 3px 5px lightgrey';
-	yyy.style.cursor = 'pointer';
+	yyy.style.display = 'inline';
 	xxx.style.display = 'none';
-  yyy.style.color = 'black';
 	yyy.style.background = 'lightgreen';
 	console.log(position);
 	document.getElementById('lat').value = Math.floor(position.coords.latitude*1000000)/1000000;
 	document.getElementById('long').value = Math.floor(position.coords.longitude*1000000)/1000000;
 }
 		</script>
+	</div>
 		{{#refresh}}
-		<h3>Loading weather data...</h3>
-		<script>
-			setTimeout(function() {
-				location.reload();
-			}, 100);
-		</script>
+			<h3>Loading weather data...</h3>
+			<script>
+				setTimeout(function() {
+					location.reload();
+				}, 1000);
+			</script>
 		{{/refresh}}
 		
 		{{#error}}
-		<h3>Error getting weather data! (position {{latitude}}, {{longitude}})</h3>
-		<h4>This could be because of an <b style="color:darkred;">invalid location</b> or a <b style="color:darkred;">temporary API outage</b>.<br>Retrying in 25 seconds...</h4>
-		<script>
-			setTimeout(function() {
-				location.reload();
-			}, 25000);
-		</script>
+			<h3>Error getting weather data! (position {{latitude}}, {{longitude}})</h3>
+			<h4>This could be because of an <b style="color:darkred;">invalid location</b> or a <b style="color:darkred;">temporary API outage</b>.<br>Retrying in 25 seconds...</h4>
+			<script>
+				setTimeout(function() {
+					location.reload();
+				}, 25000);
+			</script>
 		{{/error}}
-	</div>
+		
 		{{#forecast}}
-		<div id="chartContainer2" style="height: 370px; width: 100%; position: relative"></div>
-		<div id="chartContainer1" style="height: 370px; width: 100%; position: relative"></div>
+		<h2>7-Day forecast</h2>
+		<div id="chartContainer0" style="height: 200px; width: 100%; position: relative"></div>
+		<div id="chartContainer3" style="height: 250px; width: 100%; position: relative"></div>
+		<div id="chartContainer2" style="height: 200px; width: 100%; position: relative"></div>
 		<br>
-		<button onclick="document.getElementById('dailyDetails').style.display = 'none'; document.getElementById('dailyhide').style.display = 'inline';">- Hide Daily Details (Table)</button>
-		<button id="dailyhide" style="display:none;" onclick="document.getElementById('dailyDetails').style.display = 'block';">+ expand</button>
+		<button onclick="document.getElementById('dailyDetails').style.display = 'none'; document.getElementById('dailyhide').style.display = 'inline';">- Hide Table</button>
+		<button id="dailyhide" style="display:none;" onclick="document.getElementById('dailyDetails').style.display = 'block';">+ Expand Table</button>
 		<div id="dailyDetails" style="display:block;">
 			<br>
 			<table>
@@ -230,13 +237,21 @@ function showPosition(position) {
 			</table>
 		</div>
 		<script>
-		
 CanvasJS.addColorSet("default2",
 	[//colorSet Array
 	"#000000",
-	"#90EE90",
-	"#ff5050",
+	"#999",
 	"#0066ff",
+	{{#theme}}"lightgreen",{{/theme}}
+	{{^theme}}"green",{{/theme}}
+	"#0099ff"                
+	]);
+CanvasJS.addColorSet("default3",
+	[//colorSet Array
+	"#000000",
+	"#ff5050",
+	//"#0066ff",
+	"#90EE90",
 	"#0099ff"                
 	]);
 CanvasJS.addColorSet("default1",
@@ -247,12 +262,11 @@ CanvasJS.addColorSet("default1",
 	"#90EE90",
 	"#0099ff"       
 	]);
-		
-var chart = new CanvasJS.Chart("chartContainer2", {
-	colorSet:"default2",
-	title:{
-		text: "7-day Forecast"
-	},
+
+// TEMPERATURE
+	
+var chart = new CanvasJS.Chart("chartContainer0", {
+	colorSet:"default3",
 	{{^theme}}
 	theme: 'light1',
 	{{/theme}}
@@ -260,6 +274,104 @@ var chart = new CanvasJS.Chart("chartContainer2", {
 	theme: 'dark1',
 	{{/theme}}
 	axisY: {
+		interval: 10,
+		includeZero: false,
+		gridThickness: 1,
+		gridColor:'lightgrey'
+	},
+	axisX: {
+		gridThickness: 1,
+		gridColor: 'lightgrey'
+	},
+	toolTip:{
+		shared: true,
+		borderColor: "#2E8B57",
+		{{^theme}}
+		backgroundColor: 'light1',
+		{{/theme}}
+		{{#theme}}
+		backgroundColor: '#333',
+		{{/theme}}
+		contentFormatter: function (e) {
+			let content = " ";
+			for (let i = 0; i < e.entries.length; i++) {
+				let point = e.entries[i].dataPoint;
+				if(point.precipChance !== undefined) {
+					let days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+					let months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+					let day = days[point.x.getDay()];
+					let month = months[point.x.getMonth()];
+					let hours = point.x.getHours();
+					let apm = "AM";
+					if(hours > 11 && hours < 24) {
+						apm = "PM";
+					}
+					if(hours > 12) {
+						hours-=12;
+					}
+					if(hours == 0) {
+						hours = 12;
+					}
+					//console.log(point.x);
+					//console.log(point.date);
+					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#ff3030;'>Temperature:</b> "+Math.floor(point.temperature)+" F<br><b style='color:#2288ff;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:{{#theme}}lightgreen{{/theme}}{{^theme}}green{{/theme}};'>Humidity:</b> "+Math.floor(point.humidity)+" %<br><b style='color:#ff3030;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:#ff3030;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:{{#theme}}lightgrey{{/theme}}{{^theme}}grey{{/theme}};'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><br>";
+					return content;
+				}
+			}
+			content+= "No precise data<br> for this time.";
+			return content;
+		}
+	},
+	options: {
+		elements: {
+			point: {
+				radius: 0
+			}
+		}
+	},
+	legend:{
+		cursor: "pointer",
+		fontSize: 16,
+		itemclick: toggleDataSeries,
+	},
+	data: [
+	{
+		name: "TooltipWeather",
+		type: "spline",
+		legendText: "Thunder",
+		markerType: "none",
+		showInLegend: false,
+		dataPoints: [
+			{{&allWeather}}
+		]
+	},
+	{
+		legendText: "Temperature",
+		markerType: "none",
+		type: "spline",
+		yValueFormatString: "<b>## F</b>",
+		showInLegend: true,
+		dataPoints: [
+			{{&temperature}}
+		]
+	}
+	]
+});
+chart.render();
+
+// PRECIP , CLOUD COVER , HUMDITY
+
+var chart3 = new CanvasJS.Chart("chartContainer3", {
+	colorSet:"default2",
+	{{^theme}}
+	theme: 'light1',
+	{{/theme}}
+	{{#theme}}
+	theme: 'dark1',
+	{{/theme}}
+	axisY: {
+		interval: 25,
 		includeZero: false,
 		suffix: "",
 		gridThickness: 1,
@@ -301,7 +413,7 @@ var chart = new CanvasJS.Chart("chartContainer2", {
 					//console.log(point.x);
 					//console.log(point.date);
 					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
-					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#ff3030;'>Temperature:</b> "+Math.floor(point.temperature)+" F<br><b style='color:#2288ff;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:#ff3030;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:#ff3030;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#2288ff;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:{{#theme}}lightgreen{{/theme}}{{^theme}}green{{/theme}};'>Humidity:</b> "+Math.floor(point.humidity)+" %<br><b style='color:{{#theme}}lightgrey{{/theme}}{{^theme}}grey{{/theme}};'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><br>";
 					return content;
 				}
 			}
@@ -344,16 +456,6 @@ var chart = new CanvasJS.Chart("chartContainer2", {
 		]
 	},
 	{
-		legendText: "Temperature",
-		markerType: "none",
-		type: "spline",
-		yValueFormatString: "<b>## F</b>",
-		showInLegend: true,
-		dataPoints: [
-			{{&temperature}}
-		]
-	},
-	{
 		legendText: "Precip. % chance",
 		type: "splineArea",
 		markerType: "none",
@@ -362,12 +464,25 @@ var chart = new CanvasJS.Chart("chartContainer2", {
 		dataPoints: [
 			{{&precipitation}}
 		]
+	},
+	{
+		legendText: "Humidity",
+		type: "spline",
+		markerType: "none",
+		legendMarkerType: "circle",
+		yValueFormatString: "##",
+		showInLegend: true,
+		dataPoints: [
+			{{&humidity}}
+		]
 	}
 	]
 });
-chart.render();
+chart3.render();
 
-var chart1 = new CanvasJS.Chart("chartContainer1", {
+// WIND
+
+var chart2 = new CanvasJS.Chart("chartContainer2", {
 	colorSet:"default1",
 	title:{
 		text: ""
@@ -416,7 +531,7 @@ var chart1 = new CanvasJS.Chart("chartContainer1", {
 						hours-=12;
 					}
 					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
-					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:#ff3030;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:#ff3030;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:green;'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><b>Snowfall:</b> "+Math.floor(point.snowfall)+" in<br><br>";
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:#ff3030;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:#ff3030;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><br>";
 					
 					return content;
 				}
@@ -471,7 +586,7 @@ var chart1 = new CanvasJS.Chart("chartContainer1", {
 	}
 	]
 });
-chart1.render();
+chart2.render();
 
 function positionImage(image, index) {
 	var imageCenter = chart.axisX[0].convertValueToPixel(chart.data[0].dataPoints[index].x);
@@ -535,7 +650,7 @@ for(let xxy = 0; xxy < document.querySelectorAll(".canvasjs-chart-container > .c
 			NOTE: For the purpose of this page, location data includes the weather data associated with said location data.
 			<br><br><b>Data Collection</b><br>
 			Location data is collected in order to get the appropriate forcast for your area.
-			No other data (e.g. device type)
+			Other information may be collected for analytics/statistics.
 			<br><br><b>Data Storage</b><br>
 			Location data is saved only temporarily, in order to not have to load the data every time a page is requested.<br>
 			Data for each location expires every 2-3 hours in order to keep forecasts updated. After data for a location expires, it will not be updated until the weather for that location is requested again.
@@ -545,6 +660,7 @@ for(let xxy = 0; xxy < document.querySelectorAll(".canvasjs-chart-container > .c
 			</p>
 		{{/data}}
 		<br><br>
-		<a class="githubButton" onclick="window.location.href='/data'{{#theme}}+'/dark'{{/theme}}" href="#" aria-label="Data collection information">Data use/storage information</a>
+		<a class="githubButton" href="https://github.com/Bananabob999/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-5px; padding:0px; position:relative; height:20px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
+		<a onclick="window.location.href='/data'{{#theme}}+'/dark'{{/theme}}" href="#" aria-label="Data collection information">Data use/storage information</a>
 	</body>
 </html>
