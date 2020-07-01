@@ -26,6 +26,14 @@ function send(response, values) {
 	});
 }
 let weather = {};
+function isJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
 async function getWeather(latitude, longitude) {
 	let precipitation = "";
 	let precipitationTotal = "";
@@ -36,6 +44,8 @@ async function getWeather(latitude, longitude) {
 	let thunder = "";
 	let allWeather = "";
 	let cloud = "";
+	let humidity = "";
+	let pressure = "";
 	let options = {
 		"method": "GET",
 		"url": `https://api.weather.gov/points/${latitude},${longitude}`,
@@ -44,8 +54,20 @@ async function getWeather(latitude, longitude) {
 			"Accept": "application/geo+json"
 		}
 	};
+	weather[latitude+","+longitude] = {
+		inProgress: true,
+		timer: Date.now() + 5000
+	};
 	let r = new Request(options, (err, res) => {
 		if(err) { throw err; }
+		if(!isJsonString(res.body)) {
+			console.log(res.body);
+			weather[latitude+","+longitude] = {
+				failed: true,
+				message: res.body,
+				timer: Date.now() + 20000
+			}
+		}
 		let body = JSON.parse(res.body);
 		if(body === undefined || body.properties === undefined) {
 			weather[latitude+","+longitude] = {
@@ -61,6 +83,14 @@ async function getWeather(latitude, longitude) {
 		};
 		let r2 = new Request(options, (err, res2) => {
 			if(err) { throw err; }
+			if(!isJsonString(res2.body)) {
+				console.log(res2.body);
+				weather[latitude+","+longitude] = {
+					failed: true,
+					message: res2.body,
+					timer: Date.now() + 20000
+				}
+			}
 			let properties = JSON.parse(res2.body).properties;
 			if(properties === undefined) {
 				weather[latitude+","+longitude] = {
@@ -68,6 +98,9 @@ async function getWeather(latitude, longitude) {
 					timer: Date.now() + 20000
 				}
 				return;
+			}
+			for (let prop in properties) {
+				//console.log(prop);
 			}
 			for(let xyz in properties.probabilityOfPrecipitation.values) {
 				if(properties.probabilityOfPrecipitation.values[xyz]) {
@@ -131,6 +164,14 @@ async function getWeather(latitude, longitude) {
 					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
 					let value = Math.floor(precip.value * 10)/10;
 					cloud+=`{ x: new Date(${date.getTime()}), y:${value} },`;
+				}
+			}
+			for(let xyz in properties.relativeHumidity.values) {
+				if(properties.relativeHumidity.values[xyz]) {
+					let precip = properties.relativeHumidity.values[xyz];
+					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
+					let value = Math.floor(precip.value * 10)/10;
+					humidity+=`{ x: new Date(${date.getTime()}), y:${value} },`;
 				}
 			}
 			for(let xyz in properties.temperature.values) {
@@ -268,9 +309,28 @@ async function getWeather(latitude, longitude) {
 						indexOf = precipDatesArray.indexOf(closest);
 					}
 					let skyCoverValue = properties.skyCover.values[indexOf].value;
+					
+					precipDatesArray = [];
+					for(let xyz = 0; xyz < properties.relativeHumidity.values.length; xyz++) {
+						if(properties.relativeHumidity.values[xyz]) {
+							let precip = properties.relativeHumidity.values[xyz];
+							let precipDate = new Date(precip.validTime.replace(/\/.+/g, ''));
+							precipDatesArray.push(precipDate);
+						}
+					}
+					goal = date;
+					if(precipDatesArray[0] !== undefined) {
+						closest = precipDatesArray.reduce(function(prev, curr) {
+							return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+						});
+						indexOf = precipDatesArray.indexOf(closest);
+					}
+					let humidValue = properties.relativeHumidity.values[indexOf].value;
+					
+					//console.log(humidValue);
 					//console.log(indexOf+'-'+(Date.parse(goal)-Date.parse(precip.validTime.replace(/\/.+/g, '')))/1000/60);
 					if(skyCoverValue == 80) console.log('---------------------------');
-					allWeather+=`{ x: new Date(${date.getTime()}), y:0, temperature:${value}, precipChance:${precipValue}, date: new Date(${date.getTime()}), precipAccum:'${precipAccumValue}', windSpeed:${windSpeedValue}, thunderChance:'${thunderChanceValue}', snowfall:${snowFallValue}, windDirection:${windDirValue}, cloudCover:${skyCoverValue} },\n`
+					allWeather+=`{ x: new Date(${date.getTime()}), temperature:${value}, precipChance:${precipValue}, date: new Date(${date.getTime()}), precipAccum:'${precipAccumValue}', windSpeed:${windSpeedValue}, thunderChance:'${thunderChanceValue}', snowfall:${snowFallValue}, windDirection:${windDirValue}, cloudCover:${skyCoverValue}, humidity:${humidValue} },\n`
 				}
 			}
 			
@@ -308,6 +368,7 @@ async function getWeather(latitude, longitude) {
 					allWeather: allWeather,
 					snowFall: snowFall,
 					cloud: cloud,
+					humidity: humidity,
 					table: {
 						today: today,
 						table: table
@@ -334,6 +395,15 @@ let server = http.createServer(function (request, response) {
 		let forecast = weather[latitude+","+longitude];
 		if(forecast === undefined || forecast.timer < Date.now()) {
 			getWeather(latitude, longitude);
+			send(response, {
+				forecast: false,
+				refresh: true,
+				theme:theme
+			});
+		}else if(forecast.inProgress === true) {
+			if(forecast.timer < Date.now()) {
+				getWeather(latitude, longitude);
+			}
 			send(response, {
 				forecast: false,
 				refresh: true,
@@ -370,6 +440,7 @@ let server = http.createServer(function (request, response) {
 				allWeather: forecast.allWeather,
 				snowFall: forecast.snowFall,
 				cloud: forecast.cloud,
+				humidity: forecast.humidity,
 				sevenDay: {
 					table: forecast.table.table,
 					today: forecast.table.today
