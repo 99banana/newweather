@@ -6,7 +6,7 @@
 		<style>
 			body {
 				font-family:Arial, sans-serif;
-				top: 90px;
+				top: 0px;
 				padding:50px;
 				padding-bottom:50px;
 				position:relative;
@@ -96,23 +96,18 @@
 				{{/theme}}
 			}
 			.header {
-				position:fixed;
+				position:relative;
 				z-index:9;
 				background:transparent;
-				padding:20px 50px;
+				padding:10px 50px;
 				background-color:#fff;
-				box-shadow:3px 3px 5px #ddd;
 				{{#theme}}
 					background-color:#2a2a2a;
-					box-shadow:3px 3px 5px #111;
 				{{/theme}}
 				overflow:auto;
 				top:0;
-				left:50px;
-				right:50px;
 				overflow:auto;
-				border-bottom-left-radius: 50% 80%;
-				border-bottom-right-radius:50% 80%;
+				border-radius: 4px;
 			}
 			#floatdiv {
 				position:fixed;
