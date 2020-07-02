@@ -67,6 +67,7 @@ async function getWeather(latitude, longitude) {
 				message: res.body,
 				timer: Date.now() + 20000
 			}
+			return;
 		}
 		let body = JSON.parse(res.body);
 		if(body === undefined || body.properties === undefined) {
@@ -90,6 +91,7 @@ async function getWeather(latitude, longitude) {
 					message: res2.body,
 					timer: Date.now() + 20000
 				}
+				return;
 			}
 			let properties = JSON.parse(res2.body).properties;
 			if(properties === undefined) {
@@ -344,6 +346,15 @@ async function getWeather(latitude, longitude) {
 			let r2 = new Request(options, (err, res2) => {
 				if(err) { throw err; }
 				//console.log(res2.body);
+				if(!isJsonString(res2.body)) {
+					console.log(res2.body);
+					weather[latitude+","+longitude] = {
+						failed: true,
+						message: res2.body,
+						timer: Date.now() + 20000
+					}
+					return;
+				}
 				let properties = JSON.parse(res2.body).properties;
 				if(properties === undefined) {
 					weather[latitude+","+longitude] = {
