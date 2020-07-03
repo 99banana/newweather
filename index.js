@@ -375,7 +375,7 @@ async function getWeather(latitude, longitude) {
 				let properties = JSON.parse(res2.body).properties;
 				if(properties === undefined) {
 					weather[latitude+","+longitude] = {
-						failed: true,
+						failed: true, 
 						timer: Date.now() + 20000
 					}
 					return;
