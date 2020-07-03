@@ -7,8 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
+  "repository":"https://github.com/99banana/newweather",
   "author": "Jesse",
-  "license": "GNU GPL 3.0",
+  "license": "MPL-2.0",
   "dependencies": {
     "mustache": "^4.0.1",
     "node-static": "^0.7.11",

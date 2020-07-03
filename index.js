@@ -34,6 +34,19 @@ function isJsonString(str) {
     }
     return true;
 }
+// wrap a request in an promise
+function downloadPage(url) {
+    return new Promise((resolve, reject) => {
+        Request(url, (error, response, body) => {
+            if (error) reject(error);
+            /*if (response.statusCode != 200) {
+                reject('Invalid status code <' + response.statusCode + '>');
+            }*/
+            resolve(body);
+        });
+    });
+}
+
 async function getWeather(latitude, longitude) {
 	let precipitation = "";
 	let precipitationTotal = "";
@@ -61,7 +74,7 @@ async function getWeather(latitude, longitude) {
 	let r = new Request(options, (err, res) => {
 		if(err) { throw err; }
 		if(!isJsonString(res.body)) {
-			console.log(res.body);
+			//console.log(res.body);
 			weather[latitude+","+longitude] = {
 				failed: true,
 				message: res.body,
@@ -77,6 +90,7 @@ async function getWeather(latitude, longitude) {
 			};
 			return;
 		}
+		//console.log(body.properties);
 		options = {
 			"method": "GET",
 			"url": body.properties.forecastGridData,
@@ -85,7 +99,7 @@ async function getWeather(latitude, longitude) {
 		let r2 = new Request(options, (err, res2) => {
 			if(err) { throw err; }
 			if(!isJsonString(res2.body)) {
-				console.log(res2.body);
+				//console.log(res2.body);
 				weather[latitude+","+longitude] = {
 					failed: true,
 					message: res2.body,
@@ -102,7 +116,10 @@ async function getWeather(latitude, longitude) {
 				return;
 			}
 			for (let prop in properties) {
-				//console.log(prop);
+				let match = /.+/
+				if(prop.match(match)) {
+					//console.log(prop.match(match));
+				}
 			}
 			for(let xyz in properties.probabilityOfPrecipitation.values) {
 				if(properties.probabilityOfPrecipitation.values[xyz]) {
@@ -343,11 +360,11 @@ async function getWeather(latitude, longitude) {
 			};
 			let table = "";
 			let today = ""
-			let r2 = new Request(options, (err, res2) => {
+			let r2 = new Request(options, async function(err, res2) {
 				if(err) { throw err; }
 				//console.log(res2.body);
 				if(!isJsonString(res2.body)) {
-					console.log(res2.body);
+					//console.log(res2.body);
 					weather[latitude+","+longitude] = {
 						failed: true,
 						message: res2.body,
@@ -369,6 +386,20 @@ async function getWeather(latitude, longitude) {
 				}
 				today = `${properties.periods[0].name}: ${properties.periods[0].shortForecast}`;
 				
+				let now = new Date(Date.now());
+				now.setDate(now.getDate() - 1);
+				let sunRiseSet = "";
+				for(let xyzz = 0; xyzz < 8; xyzz++) {
+					now.setDate(now.getDate() + 1);
+					let times = await getSunriseTimes(latitude, longitude, now.toUTCString());
+					//console.log(times);
+					sunRiseSet += `{
+			startValue: new Date(${Date.parse(times.results.sunrise)}),
+			endValue: new Date(${Date.parse(times.results.sunset)}),
+			color: stripColor
+		},`;
+				}
+				
 				weather[latitude+","+longitude] = {
 					precipitation: precipitation,
 					precipitationTotal: precipitationTotal,
@@ -379,11 +410,12 @@ async function getWeather(latitude, longitude) {
 					allWeather: allWeather,
 					snowFall: snowFall,
 					cloud: cloud,
-					humidity: humidity,
+		    		humidity: humidity,
 					table: {
 						today: today,
 						table: table
 					},
+					sunTimes: sunRiseSet,
 					timer: Date.now() + 1200000
 				}
 				console.log("Weather gotten!");
@@ -392,7 +424,20 @@ async function getWeather(latitude, longitude) {
 		});
 	});
 }
+async function getSunriseTimes(latitude, longitude, date) {
+	let url = `https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}&date=${date}&formatted=0`;
+	let html;
+	try {
+        html = await downloadPage(url);
+		html = JSON.parse(html);
+    } catch (error) {
+        console.error(error);
+    }
+	return html;
+}
+
 getWeather(38.466630, -78.880290);
+getSunriseTimes(38.466630, -78.880290, 'Today');
 
 var StaticServer = new(Static.Server)();
 let server = http.createServer(function (request, response) {
@@ -452,6 +497,7 @@ let server = http.createServer(function (request, response) {
 				snowFall: forecast.snowFall,
 				cloud: forecast.cloud,
 				humidity: forecast.humidity,
+				daylightStrips: forecast.sunTimes,
 				sevenDay: {
 					table: forecast.table.table,
 					today: forecast.table.today

@@ -152,21 +152,35 @@
 	<div class="header">
 		<h3 style="padding:2px; margin:2px;" >Enter Location:</h3>
 		<div class="form">
-			{{^latitude}}
-			Latitude <input id="lat" type="number" value="38.466630">
-			Longitude <input id="long" type="number" value="-78.880290">
-			{{/latitude}}
-			{{#latitude}}
-			Latitude <input id="lat" type="number" value="{{latitude}}">
-			Longitude <input id="long" type="number" value="{{longitude}}">
-			{{/latitude}}
-			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/dark'{{/theme}}">Get Forecast</button>
-			<button id="autoButton" onclick="getLocation();">Detect location</button>
 			{{^refresh}}
+				{{^latitude}}
+					Latitude <input id="lat" type="number" value="38.466630">
+					Longitude <input id="long" type="number" value="-78.880290">
+				{{/latitude}}
+				{{#latitude}}
+					Latitude <input id="lat" type="number" value="{{latitude}}">
+					Longitude <input id="long" type="number" value="{{longitude}}">
+				{{/latitude}}
+				<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/dark'{{/theme}}">Get Forecast</button>
+				<button id="autoButton" onclick="getLocation();">Detect location</button>
+			{{/refresh}}
+			{{#refresh}}
+				{{^latitude}}
+					Latitude <input id="lat" type="number" value="38.466630" disabled>
+					Longitude <input id="long" type="number" value="-78.880290" disabled>
+				{{/latitude}}
+				{{#latitude}}
+					Latitude <input id="lat" type="number" value="{{latitude}}" disabled>
+					Longitude <input id="long" type="number" value="{{longitude}}" disabled>
+				{{/latitude}}
+				<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/dark'{{/theme}}" disabled>Get Forecast</button>
+				<button id="autoButton" onclick="getLocation();" disabled>Detect location</button>
+			{{/refresh}}
+			
 			{{^theme}}<button class="buttonDark" onclick="window.location.href=window.location.href+'/dark'" aria-label="Dark theme"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Dark theme</button>{{/theme}}
 			{{#theme}}<button class="buttonDark" onclick="window.location.href=window.location.href.replace('/dark', '')" aria-label="Light theme"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Light theme</button>{{/theme}}
-			<br>
-			{{/refresh}}
+			<br><br>
+			<a class="githubButton" href="https://github.com/99banana/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-5px; padding:0px; position:relative; height:20px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
 		</div>
 		<script>
 		
@@ -216,7 +230,7 @@ function showPosition(position) {
 		
 		{{#forecast}}
 		<h2>7-Day forecast</h2>
-		<div id="chartContainer0" style="height: 200px; width: 100%; position: relative"></div>
+		<div id="chartContainer0" style="height: 210px; width: 100%; position: relative"></div>
 		<div id="chartContainer3" style="height: 250px; width: 100%; position: relative"></div>
 		<div id="chartContainer2" style="height: 200px; width: 100%; position: relative"></div>
 		<br>
@@ -259,6 +273,10 @@ CanvasJS.addColorSet("default1",
 	]);
 
 // TEMPERATURE
+
+let stripColor = {{^theme}}"#ffffdd"{{/theme}} {{#theme}}"#393930"{{/theme}} ;
+let labelColor = {{^theme}}"black"{{/theme}} {{#theme}}"white"{{/theme}} ;
+let weekDays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 	
 var chart = new CanvasJS.Chart("chartContainer0", {
 	colorSet:"default3",
@@ -274,7 +292,21 @@ var chart = new CanvasJS.Chart("chartContainer0", {
 		gridThickness: 1,
 		gridColor:'lightgrey'
 	},
+	axisX2: {
+		margin:0,
+		labelAngle:-5,
+		labelFontSize:20,
+		valueFormatString: " DDD ",
+		stripLines:[
+			{{&daylightStrips}}
+		],
+		gridThickness: 1,
+		gridColor: 'lightgrey'
+	},
 	axisX: {
+		stripLines:[
+			{{&daylightStrips}}
+		],
 		gridThickness: 1,
 		gridColor: 'lightgrey'
 	},
@@ -332,6 +364,7 @@ var chart = new CanvasJS.Chart("chartContainer0", {
 	},
 	data: [
 	{
+		axisXType: "secondary",
 		name: "TooltipWeather",
 		type: "spline",
 		legendText: "Thunder",
@@ -373,6 +406,9 @@ var chart3 = new CanvasJS.Chart("chartContainer3", {
 		gridColor: 'lightgrey'
 	},
 	axisX: {
+		stripLines:[
+			{{&daylightStrips}}
+		],
 		gridThickness: 1,
 		gridColor: 'lightgrey'
 	},
@@ -495,6 +531,9 @@ var chart2 = new CanvasJS.Chart("chartContainer2", {
 		gridColor: 'lightgrey'
 	},
 	axisX: {
+		stripLines:[
+			{{&daylightStrips}}
+		],
 		gridThickness: 1,
 		gridColor: 'lightgrey'
 	},
@@ -638,24 +677,5 @@ for(let xxy = 0; xxy < document.querySelectorAll(".canvasjs-chart-container > .c
 		</script>
 		{{/forecast}}
 		<script async defer src="https://buttons.github.io/buttons.js"></script>
-		
-		{{#data}}
-			<h3>Data use</h3>
-			<p style="text-align:left; font-size:1.1em;">
-			NOTE: For the purpose of this page, location data includes the weather data associated with said location data.
-			<br><br><b>Data Collection</b><br>
-			Location data is collected in order to get the appropriate forcast for your area.
-			Other information may be collected for analytics/statistics.
-			<br><br><b>Data Storage</b><br>
-			Location data is saved only temporarily, in order to not have to load the data every time a page is requested.<br>
-			Data for each location expires every 2-3 hours in order to keep forecasts updated. After data for a location expires, it will not be updated until the weather for that location is requested again.
-			Data is deleted each time the server restarts.
-			<br><br><b>Cookies</b><br>
-			This site does not use cookies.
-			</p>
-		{{/data}}
-		<br><br>
-		<a class="githubButton" href="https://github.com/99banana/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-5px; padding:0px; position:relative; height:20px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
-		<a onclick="window.location.href='/data'{{#theme}}+'/dark'{{/theme}}" href="#" aria-label="Data collection information">Data use/storage information</a>
 	</body>
 </html>
