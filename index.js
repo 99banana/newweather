@@ -168,7 +168,7 @@ async function getWeather(latitude, longitude) {
 				if(properties.quantitativePrecipitation.values[xyz]) {
 					let precip = properties.quantitativePrecipitation.values[xyz];
 					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
-					let value = Math.floor(precip.value * 10)/10;
+					let value = Math.floor(precip.value*0.0393700787 * 1000)/1000;
 					precipitationTotal+=`{ x: new Date(${date.getTime()}), y:${value} },`;
 				}
 			}
