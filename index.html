@@ -2,6 +2,7 @@
 	<head>
 		<title>Weather ... ?</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"> 
 		<link rel="icon" href="/static/icon.png">
 		<link rel="stylesheet" href="/static/stylesheet.css">
@@ -10,11 +11,11 @@
 	</head>
 	<body>
 	<div class="header">
-		<h1 style="color:black;"><a class="black" href="/{{#theme}}dark{{/theme}}">Newweather</a></h1>
+		<h1><a class="solid" href="/{{#theme}}dark{{/theme}}">Newweather</a></h1>
 		<div class="form">
 		
 			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/dark'{{/theme}}" {{#refresh}}disabled{{/refresh}}>Get Forecast</button>
-			<button class="primary" id="autoButton" onclick="getLocation();" {{#refresh}}disabled{{/refresh}}>Get location</button>
+			<button class="primary" id="autoButton" onclick="getLocation();" {{#refresh}}disabled{{/refresh}}>Find my location</button>
 			
 			{{^theme}}<button class="buttonDark" onclick="window.location.href=window.location.href+'/dark'" aria-label="Dark theme"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Dark theme</button>{{/theme}}
 			{{#theme}}<button onclick="window.location.href=window.location.href.replace('/dark', '')" aria-label="Light theme"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Light theme</button>{{/theme}}
@@ -34,7 +35,7 @@
 var xxx = document.getElementById("autoButton");
 var yyy = document.getElementById("forecastButton");
 function getLocation() {
-	xxx.innerHTML = "Detecting...";
+	xxx.innerHTML = "Finding ...";
 	console.log(window.parent.document.location.protocol);
 	if(window.parent.document.location.protocol === 'http:') {
 		xxx.innerHTML = "Could not detect location";
@@ -45,6 +46,8 @@ function getLocation() {
 
 function showPosition(position) {
 	yyy.classList.add('primary');
+	xxx.classList.remove('primary');
+	xxx.innerHTML = 'Found location';
 	console.log(position);
 	document.getElementById('lat').value = Math.floor(position.coords.latitude*1000000)/1000000;
 	document.getElementById('long').value = Math.floor(position.coords.longitude*1000000)/1000000;
@@ -56,23 +59,59 @@ function showPosition(position) {
 	{{^forecast}}
 	{{^error}}
 	<br>
-	<h2>Weather In Two Clicks</h2>
-	<h3>Get Location<br><span style="font-size:0.75em">then</span><br>Get Forecast</h3>
-	
-	<h2>Works on any device</h2>
-	<h3>Loads fast.<br>Still looks good on small screens</h3>
-	
+	<div id="block-1" class="block">
+		<h2>Weather In <span class="yellow">Two Clicks</span></h2>
+		<h3>"Find my Location"<br><span style="font-size:0.75em">then</span><br>"Get Forecast"</h3>
+	</div>
+	<div id="block-2" style="display:none" class="block">
+		<h2>Weather On <span class="yellow">Any Device</span></h2>
+		<h3>Responsive - scales to any device or screen size</h3>
+	</div>
+	<div id="block-3" style="display:none" class="block">
+		<h2>Weather <span class="yellow">Without Bloat</span></h2>
+		<h3>Only the essentials means faster loading.<br><br>Just weather and graphs to display it on.</h3>
+	</div>
+	<div id="block-4" style="display:none" class="block">
+		<h2>Weather that's <span class="yellow">Open Source</span></h2>
+		<h3>Everything is better when it's open source.<br><br>
+		<a href="https://github.com/99banana/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-5px; padding:0px; position:relative; height:20px;" src="/static/GitHub-Mark-64px.png"> Source code on GitHub</a></h3>
+	</div>
+	<script>
+		
+		let blocks = ["block-1", "block-2", "block-3", "block-4"];
+		let blockID = 1;
+		
+		setInterval(function() {
+			if(blockID + 1 > blocks.length) {
+				blockID = 0;
+			}
+			for(let block in blocks) {
+				document.getElementById(blocks[block]).style.display = 'none';
+			}
+			document.getElementById(blocks[blockID]).style.display = 'block';
+			blockID++;
+		}, 8000);
+		
+	</script>
+	<br>
 	{{/error}}
 	{{/forecast}}
 	{{/refresh}}
 	
 	{{#refresh}}
-		<h3>Loading weather data...</h3>
-		<script>
-			setTimeout(function() {
-				location.reload();
-			}, 1000);
-		</script>
+		<br>
+		<div class="block">
+			<h3>Loading weather data...</h3>
+			<h4>{{time}}/7 {{message}}</h4>
+			<div width="400px" style="padding:20px;">
+				<div style="width: calc({{time}}px * 25);" class="yellow center">{{time}}/15</div>
+			</div>
+			<script>
+				setTimeout(function() {
+					location.reload();
+				}, 500);
+			</script>
+		</div>
 	{{/refresh}}
 	
 	{{#error}}
@@ -535,6 +574,9 @@ for(let xxy = 0; xxy < document.querySelectorAll(".canvasjs-chart-container > .c
 		{{/forecast}}
 		
 		<br><br>
-		<a class="githubButton" href="https://github.com/99banana/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-5px; padding:0px; position:relative; height:20px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
+		<div class="center">
+			<b>Newweather is open source!</b><br><br>
+			<a class="githubButton" href="https://github.com/99banana/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-5px; padding:0px; position:relative; height:20px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
+		</div>
 	</body>
 </html>
