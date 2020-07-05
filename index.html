@@ -2,185 +2,32 @@
 	<head>
 		<title>Weather ... ?</title>
 		<meta charset="utf-8">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"> 
 		<link rel="icon" href="/static/icon.png">
-		<style>
-			body {
-				font-family:Arial, sans-serif;
-				top: 0px;
-				padding:50px;
-				padding-bottom:50px;
-				position:relative;
-				background:white;
-				color:black;
-				{{#theme}}
-					background:#2a2a2a;
-					color:white;
-				{{/theme}}
-			}
-			p, div {
-				font-size:1em;
-			}
-			input {
-				padding:5px;
-				border:1px transparent;
-				background:#ddd;
-				box-shadow:3px 3px 5px #aaa;
-				font-size:1em;
-				border-radius:4px;
-				{{#theme}}
-					background:#444;
-					color:white;
-					box-shadow:3px 3px 5px #111;
-				{{/theme}}
-			}
-			button {
-				font-family:arial;
-				padding:6px;
-				border:1px transparent;
-				background:#ddd;
-				box-shadow:3px 3px 5px #aaa;
-				font-size:1em;
-				cursor:pointer;
-				font-weight:bold;
-				border-radius:4px;
-				{{#theme}}
-					background:#444;
-					color:white;
-					box-shadow:3px 3px 5px #111;
-				{{/theme}}
-			}
-			.buttonDark {
-				color:white;
-				cursor:pointer;
-				background:#444;
-				{{#theme}}
-					background:#ddd;
-					color:black;
-				{{/theme}}
-			}
-			.form {
-				padding:5px;
-				text-align:center;
-			}
-			h1, h2, h3, h4, h5 {
-				text-align:center;
-			}
-			table {
-				border-collapse:collapse;
-				width:100%;
-			}
-			td {
-				text-align:left;
-				padding:15px;
-				padding-left:30px;
-			}
-			tr:nth-child(even) {background-color: #f2f2f2;}
-			{{#theme}}
-				tr:nth-child(even) {background-color: #444;}
-			{{/theme}}
-			tr:hover {
-				background-color: #ddd;
-				{{#theme}}
-					background-color:#222;
-				{{/theme}}
-			}
-			th {
-				padding:10px;
-				font-size:1.2em;
-				background-color:#ddd;
-				min-width:150px;
-				text-align:left;
-				padding-left:30px;
-				{{#theme}}
-					background-color:#222;
-				{{/theme}}
-			}
-			.header {
-				position:relative;
-				z-index:9;
-				background:transparent;
-				padding:10px 50px;
-				background-color:#fff;
-				{{#theme}}
-					background-color:#2a2a2a;
-				{{/theme}}
-				overflow:auto;
-				top:0;
-				overflow:auto;
-				border-radius: 4px;
-			}
-			#floatdiv {
-				position:fixed;
-				top:-50px;
-				height:200%;
-				width:2px;
-				background:red;
-				z-index:99;
-			}
-			#floatdiv:hover {
-				background:darkred;
-			}
-			#nooo {
-				position:fixed;
-				top:5;
-				left:5;
-			}
-			.footer {
-				background-color:lightgrey;
-				padding:10px;
-				margin-top:20px;
-				font-size:15px;
-				font-weight:bold;
-			}
-			.githubButton {
-				color:black;
-				text-decoration:none;
-				border: 1px solid #ccc;
-				border-radius:3px;
-				padding:3px 7px;
-				background: rgb(175,175,175);
-				background: linear-gradient(0deg, rgba(226,235,234,1) 0%, rgba(255,255,255,1) 100%);
-			}
-			.githubButton:hover {
-				background: rgb(226,235,234);
-				border-color: #aaa;
-			}
-		</style>
+		<link rel="stylesheet" href="/static/stylesheet.css">
+		{{#theme}}<link rel="stylesheet" href="/static/stylesheet-dark.css">{{/theme}}
 		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 	</head>
 	<body>
 	<div class="header">
-		<h3 style="padding:2px; margin:2px;" >Enter Location:</h3>
+		<h1 style="color:black;"><a class="black" href="/{{#theme}}dark{{/theme}}">Newweather</a></h1>
 		<div class="form">
-			{{^refresh}}
-				{{^latitude}}
-					Latitude <input id="lat" type="number" value="38.466630">
-					Longitude <input id="long" type="number" value="-78.880290">
-				{{/latitude}}
-				{{#latitude}}
-					Latitude <input id="lat" type="number" value="{{latitude}}">
-					Longitude <input id="long" type="number" value="{{longitude}}">
-				{{/latitude}}
-				<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/dark'{{/theme}}">Get Forecast</button>
-				<button id="autoButton" onclick="getLocation();">Detect location</button>
-			{{/refresh}}
-			{{#refresh}}
-				{{^latitude}}
-					Latitude <input id="lat" type="number" value="38.466630" disabled>
-					Longitude <input id="long" type="number" value="-78.880290" disabled>
-				{{/latitude}}
-				{{#latitude}}
-					Latitude <input id="lat" type="number" value="{{latitude}}" disabled>
-					Longitude <input id="long" type="number" value="{{longitude}}" disabled>
-				{{/latitude}}
-				<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/dark'{{/theme}}" disabled>Get Forecast</button>
-				<button id="autoButton" onclick="getLocation();" disabled>Detect location</button>
-			{{/refresh}}
+		
+			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/dark'{{/theme}}" {{#refresh}}disabled{{/refresh}}>Get Forecast</button>
+			<button class="primary" id="autoButton" onclick="getLocation();" {{#refresh}}disabled{{/refresh}}>Get location</button>
 			
 			{{^theme}}<button class="buttonDark" onclick="window.location.href=window.location.href+'/dark'" aria-label="Dark theme"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Dark theme</button>{{/theme}}
-			{{#theme}}<button class="buttonDark" onclick="window.location.href=window.location.href.replace('/dark', '')" aria-label="Light theme"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Light theme</button>{{/theme}}
+			{{#theme}}<button onclick="window.location.href=window.location.href.replace('/dark', '')" aria-label="Light theme"><img style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Light theme</button>{{/theme}}
 			<br><br>
-			<a class="githubButton" href="https://github.com/99banana/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-5px; padding:0px; position:relative; height:20px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
+			
+			{{^latitude}}
+				Latitude <input id="lat" type="number" value="38.466630" {{#refresh}}disabled{{/refresh}}>
+				Longitude <input id="long" type="number" value="-78.880290" {{#refresh}}disabled{{/refresh}}>
+			{{/latitude}}
+			{{#latitude}}
+				Latitude <input id="lat" type="number" value="{{latitude}}" {{#refresh}}disabled{{/refresh}}>
+				Longitude <input id="long" type="number" value="{{longitude}}" {{#refresh}}disabled{{/refresh}}>
+			{{/latitude}}
 		</div>
 		<script>
 		
@@ -188,64 +35,74 @@ var xxx = document.getElementById("autoButton");
 var yyy = document.getElementById("forecastButton");
 function getLocation() {
 	xxx.innerHTML = "Detecting...";
-	yyy.style.display = 'none';
 	console.log(window.parent.document.location.protocol);
 	if(window.parent.document.location.protocol === 'http:') {
-		xxx.innerHTML = "Error";
-		yyy.style.display = 'inline';
-		alert("Oops. Autodetecting location is only available on a secure connection.");
+		xxx.innerHTML = "Could not detect location";
 	}else {
 		navigator.geolocation.getCurrentPosition(showPosition);
 	}
 }
 
 function showPosition(position) {
-	yyy.style.display = 'inline';
-	xxx.style.display = 'none';
-	yyy.style.background = 'lightgreen';
+	yyy.classList.add('primary');
 	console.log(position);
 	document.getElementById('lat').value = Math.floor(position.coords.latitude*1000000)/1000000;
 	document.getElementById('long').value = Math.floor(position.coords.longitude*1000000)/1000000;
 }
 		</script>
 	</div>
-		{{#refresh}}
-			<h3>Loading weather data...</h3>
-			<script>
-				setTimeout(function() {
-					location.reload();
-				}, 1000);
-			</script>
-		{{/refresh}}
-		
-		{{#error}}
-			<h3>Error getting weather data! (position {{latitude}}, {{longitude}})</h3>
-			<h4>This could be because of an <b style="color:darkred;">invalid location</b> or a <b style="color:darkred;">temporary API outage</b>.<br>Retrying in 25 seconds...</h4>
-			<script>
-				setTimeout(function() {
-					location.reload();
-				}, 25000);
-			</script>
-		{{/error}}
-		
-		{{#forecast}}
-		<h2>7-Day forecast</h2>
-		<div id="chartContainer0" style="height: 210px; width: 100%; position: relative"></div> 
-		<div id="chartContainer3" style="height: 250px; width: 100%; position: relative"></div>
-		<div id="chartContainer2" style="height: 200px; width: 100%; position: relative"></div>
-		<br>
-		<button onclick="document.getElementById('dailyDetails').style.display = 'none'; document.getElementById('dailyhide').style.display = 'inline';">- Hide Table</button>
-		<button id="dailyhide" style="display:none;" onclick="document.getElementById('dailyDetails').style.display = 'block';">+ Expand Table</button>
-		<div id="dailyDetails" style="display:block;">
-			<br>
-			<table>
-				<tr>
-					<th>Time</th><th>Temperature</th><th>Description</th>
-				</tr>
-				{{ &sevenDay.table }}
-			</table>
-		</div>
+	
+	{{^refresh}}
+	{{^forecast}}
+	{{^error}}
+	<br>
+	<h2>Weather In Two Clicks</h2>
+	<h3>Get Location<br><span style="font-size:0.75em">then</span><br>Get Forecast</h3>
+	
+	<h2>Works on any device</h2>
+	<h3>Loads fast.<br>Still looks good on small screens</h3>
+	
+	{{/error}}
+	{{/forecast}}
+	{{/refresh}}
+	
+	{{#refresh}}
+		<h3>Loading weather data...</h3>
 		<script>
+			setTimeout(function() {
+				location.reload();
+			}, 1000);
+		</script>
+	{{/refresh}}
+	
+	{{#error}}
+		<h3>Error getting weather data! (position {{latitude}}, {{longitude}})</h3>
+		<h4>This could be because of an <b style="color:darkred;">invalid location</b> or a <b style="color:darkred;">temporary API outage</b>.<br>Retrying in 25 seconds...</h4>
+		<script>
+			setTimeout(function() {
+				location.reload();
+			}, 25000);
+		</script>
+	{{/error}}
+	
+	{{#forecast}}
+	<h2>7-Day forecast</h2>
+	<div id="chartContainer0" style="height: 210px; width: 100%; position: relative"></div> 
+	<div id="chartContainer3" style="height: 250px; width: 100%; position: relative"></div>
+	<div id="chartContainer2" style="height: 200px; width: 100%; position: relative"></div>
+	<br>
+	<button onclick="document.getElementById('dailyDetails').style.display = 'none'; document.getElementById('dailyhide').style.display = 'inline';">- Hide Table</button>
+	<button id="dailyhide" style="display:none;" onclick="document.getElementById('dailyDetails').style.display = 'block';">+ Expand Table</button>
+	<div id="dailyDetails" style="display:block;">
+		<br>
+		<table>
+			<tr>
+				<th>Time</th><th>Temperature</th><th>Description</th>
+			</tr>
+			{{ &sevenDay.table }}
+		</table>
+	</div>
+	<script>
 CanvasJS.addColorSet("default2",
 	[//colorSet Array
 	"#000000",
@@ -676,6 +533,8 @@ for(let xxy = 0; xxy < document.querySelectorAll(".canvasjs-chart-container > .c
 }
 		</script>
 		{{/forecast}}
-		<script async defer src="https://buttons.github.io/buttons.js"></script>
+		
+		<br><br>
+		<a class="githubButton" href="https://github.com/99banana/newweather" aria-label="View source code on GitHub"><img style="margin:0px; margin-bottom:-5px; padding:0px; position:relative; height:20px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
 	</body>
 </html>

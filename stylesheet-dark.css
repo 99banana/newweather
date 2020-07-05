@@ -1,0 +1,42 @@
+body {
+	background:#2a2a2a;
+	color:white;
+}
+input {
+	background:#444;
+	color:white;
+	box-shadow:3px 3px 5px #111;
+}
+input:hover, input:focus, input:active {
+	background:#666;
+}
+button {
+	background:#444;
+	color:white;
+	box-shadow:3px 3px 5px #111;
+}
+button.primary {
+	color:black;
+	background:#ffe082;
+	box-shadow:1px 1px 5px #caae53;
+}
+button.primary:hover, button.primary:focus {
+	background:#caae53;
+}
+button:hover, button:focus {
+	background:#666;
+}
+.buttonDark {
+	background:#ddd;
+	color:black;
+}
+.buttonDark:hover, .buttonDark:focus {
+	background:#ccc;
+}
+tr:nth-child(even) {background-color: #444;}
+tr:hover {
+		background-color:#222;
+}
+th {
+	background-color:#222;
+}
