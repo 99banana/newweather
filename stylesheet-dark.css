@@ -33,10 +33,26 @@ button:hover, button:focus {
 .buttonDark:hover, .buttonDark:focus {
 	background:#ccc;
 }
+.yellow {
+	background: transparent;
+	color: #ffe082;
+	padding: 3px;
+	border-radius: 4px;
+}
+.block {
+	border: 2px solid #444;
+	box-shadow: 3px 3px 5px #111;
+}
+table {
+	box-shadow: 3px 3px 5px #111;
+}
 tr:nth-child(even) {background-color: #444;}
 tr:hover {
-		background-color:#222;
+	background-color:#333;
 }
 th {
-	background-color:#222;
+	background-color:#333;
+}
+a.solid {
+	color:white;
 }

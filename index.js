@@ -26,6 +26,8 @@ function send(response, values) {
 	});
 }
 let weather = {};
+let progress = {};
+
 function isJsonString(str) {
     try {
         JSON.parse(str);
@@ -48,6 +50,13 @@ function downloadPage(url) {
 }
 
 async function getWeather(latitude, longitude) {
+	
+	// progress 0%
+	progress[latitude+","+longitude] = {
+		num: 0,
+		txt: "Starting to get weather ...",
+	};
+	
 	let precipitation = "";
 	let precipitationTotal = "";
 	let temperature = "";
@@ -71,7 +80,13 @@ async function getWeather(latitude, longitude) {
 		inProgress: true,
 		timer: Date.now() + 5000
 	};
+	
 	let r = new Request(options, (err, res) => {
+		// progress 0%
+		progress[latitude+","+longitude] = {
+			num: 1,
+			txt: "Getting forecast station and grid ID ...",
+		};
 		if(err) { throw err; }
 		if(!isJsonString(res.body)) {
 			//console.log(res.body);
@@ -97,6 +112,11 @@ async function getWeather(latitude, longitude) {
 			"headers": { "User-Agent": "node.js v14.4.0 (contact: gjkreider69@gmail.com)", "Accept": "application/geo+json" }
 		};
 		let r2 = new Request(options, (err, res2) => {
+			// progress 0%
+			progress[latitude+","+longitude] = {
+				num: 2,
+				txt: "Getting forecast for gridpoint ...",
+			};
 			if(err) { throw err; }
 			if(!isJsonString(res2.body)) {
 				//console.log(res2.body);
@@ -121,6 +141,11 @@ async function getWeather(latitude, longitude) {
 					//console.log(prop.match(match));
 				}
 			}
+			// progress 0%
+			progress[latitude+","+longitude] = {
+				num: 3,
+				txt: "Parsing weather data ...",
+			};
 			for(let xyz in properties.probabilityOfPrecipitation.values) {
 				if(properties.probabilityOfPrecipitation.values[xyz]) {
 					let precip = properties.probabilityOfPrecipitation.values[xyz];
@@ -193,6 +218,11 @@ async function getWeather(latitude, longitude) {
 					humidity+=`{ x: new Date(${date.getTime()}), y:${value} },`;
 				}
 			}
+			// progress 0%
+			progress[latitude+","+longitude] = {
+				num: 4,
+				txt: "Preparing tooltip...",
+			};
 			for(let xyz in properties.temperature.values) {
 				if(properties.temperature.values[xyz]) {
 					let temp = properties.temperature.values[xyz];
@@ -359,7 +389,13 @@ async function getWeather(latitude, longitude) {
 				"headers": { "User-Agent": "node.js v14.4.0 (contact: gjkreider69@gmail.com)", "Accept": "application/geo+json" }
 			};
 			let table = "";
-			let today = ""
+			let today = "";
+			
+			progress[latitude+","+longitude] = {
+				num: 5,
+				txt: "Preparing table...",
+			};
+			
 			let r2 = new Request(options, async function(err, res2) {
 				if(err) { throw err; }
 				//console.log(res2.body);
@@ -386,10 +422,16 @@ async function getWeather(latitude, longitude) {
 				}
 				today = `${properties.periods[0].name}: ${properties.periods[0].shortForecast}`;
 				
+				progress[latitude+","+longitude] = {
+					num: 6,
+					txt: "Getting sunrise/set data...",
+				};
+				
 				let now = new Date(Date.now());
 				now.setDate(now.getDate() - 1);
 				let sunRiseSet = "";
 				for(let xyzz = 0; xyzz < 8; xyzz++) {
+					progress[latitude+","+longitude].num++;
 					now.setDate(now.getDate() + 1);
 					let times = await getSunriseTimes(latitude, longitude, now.toUTCString());
 					//console.log(times);
@@ -419,6 +461,10 @@ async function getWeather(latitude, longitude) {
 					timer: Date.now() + 1200000
 				}
 				console.log("Weather gotten!");
+				progress[latitude+","+longitude] = {
+					num: 7,
+					txt: "Done!",
+				};
 				
 			});
 		});
@@ -449,22 +495,43 @@ let server = http.createServer(function (request, response) {
 		let longitude = request.url.split('/')[3];
 		let latitude = request.url.split('/')[2];
 		let forecast = weather[latitude+","+longitude];
+		let Wprogress = progress[latitude+","+longitude];
 		if(forecast === undefined || forecast.timer < Date.now()) {
 			getWeather(latitude, longitude);
-			send(response, {
-				forecast: false,
-				refresh: true,
-				theme:theme
-			});
+			if(Wprogress) {
+				send(response, {
+					forecast: false,
+					refresh: true,
+					time: Wprogress.num,
+					message: Wprogress.txt,
+					theme:theme
+				});
+			}else {
+				send(response, {
+					forecast: false,
+					refresh: true,
+					theme:theme
+				});
+			}
 		}else if(forecast.inProgress === true) {
 			if(forecast.timer < Date.now()) {
 				getWeather(latitude, longitude);
 			}
-			send(response, {
-				forecast: false,
-				refresh: true,
-				theme:theme
-			});
+			if(Wprogress) {
+				send(response, {
+					forecast: false,
+					refresh: true,
+					time: Wprogress.num,
+					message: Wprogress.txt,
+					theme:theme
+				});
+			}else {
+				send(response, {
+					forecast: false,
+					refresh: true,
+					theme:theme
+				});
+			}
 		}else if(forecast.failed === true) {
 			if(forecast.timer < Date.now()) {
 				getWeather(latitude, longitude);
