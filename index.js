@@ -49,6 +49,42 @@ function downloadPage(url) {
     });
 }
 
+function toCardinal(i) {
+	if(i >= 348.75 || i < 11.25){
+		return +i + ". -=- N";
+	} else if (i >= 11.25 && i < 33.75) {
+		return +i + ". -=- NNE";
+	} else if (i >= 33.75 && i < 56.25) {
+		return +i + ". -=- NE";
+	} else if (i >= 56.25 && i < 78.75) {
+		return +i + ". -=- ENE";
+	} else if (i >= 78.25 && i < 101.25) {
+		return +i + ". -=- E";
+	} else if (i >= 101.25 && i < 123.75) {
+		return +i + ". -=- ESE";
+	} else if (i >= 123.75 && i < 146.25) {
+		return +i + ". -=- SE";
+	} else if (i >= 146.25 && i < 168.75) {
+		return +i + ". -=- SSE";
+	} else if (i >= 168.75 && i < 191.25) {
+		return +i + ". -=- S";
+	} else if (i >= 191.25 && i < 213.75) {
+		return +i + ". -=- SSW";
+	} else if (i >= 213.75 && i < 236.25) {
+		return +i + ". -=- SW";
+	} else if (i >= 236.25 && i < 258.75) {
+		return +i + ". -=- WSW";
+	} else if (i >= 258.75 && i < 281.25) {
+		return +i + ". -=- W";
+	} else if (i >= 281.25 && i < 303.75) {
+		return +i + ". -=- WNW";
+	} else if (i >= 303.75 && i < 326.25) {
+		return +i + ". -=- NW";
+	} else if (i >= 326.25 && i < 348.75) {
+		return +i + ". -=- NNW";
+	}
+}
+
 async function getWeather(latitude, longitude) {
 	
 	// progress 0%
@@ -340,7 +376,8 @@ async function getWeather(latitude, longitude) {
 						indexOf = precipDatesArray.indexOf(closest);
 						precip = properties.windDirection.values[indexOf];
 					}
-					let windDirValue = properties.windDirection.values[indexOf].value;
+					let windDirValue = toCardinal(properties.windDirection.values[indexOf].value).replace(/\d+. -=- /g, '');
+					//console.log(windDirValue);
 					
 					precipDatesArray = [];
 					for(let xyz = 0; xyz < properties.skyCover.values.length; xyz++) {
@@ -379,7 +416,7 @@ async function getWeather(latitude, longitude) {
 					//console.log(humidValue);
 					//console.log(indexOf+'-'+(Date.parse(goal)-Date.parse(precip.validTime.replace(/\/.+/g, '')))/1000/60);
 					if(skyCoverValue == 80) console.log('---------------------------');
-					allWeather+=`{ x: new Date(${date.getTime()}), temperature:${value}, precipChance:${precipValue}, date: new Date(${date.getTime()}), precipAccum:'${precipAccumValue}', windSpeed:${windSpeedValue}, thunderChance:'${thunderChanceValue}', snowfall:${snowFallValue}, windDirection:${windDirValue}, cloudCover:${skyCoverValue}, humidity:${humidValue} },\n`
+					allWeather+=`{ x: new Date(${date.getTime()}), temperature:${value}, precipChance:${precipValue}, date: new Date(${date.getTime()}), precipAccum:'${precipAccumValue}', windSpeed:${windSpeedValue}, thunderChance:'${thunderChanceValue}', snowfall:${snowFallValue}, windDirection:"${windDirValue}", cloudCover:${skyCoverValue}, humidity:${humidValue} },\n`
 				}
 			}
 			
