@@ -104,7 +104,7 @@ function showPosition(position) {
 			<h3>Loading weather data...</h3>
 			<h4>{{time}}/7 {{message}}</h4>
 			<div width="400px" style="padding:20px;">
-				<div style="width: calc({{time}}px * 25);" class="yellow center">{{time}}/15</div>
+				<div style="width: calc({{time}}px * 25);" class="yellow center background">{{time}}/15</div>
 			</div>
 			<script>
 				setTimeout(function() {
@@ -238,7 +238,7 @@ var chart = new CanvasJS.Chart("chartContainer0", {
 					//console.log(point.x);
 					//console.log(point.date);
 					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
-					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#ff3030;'>Temperature:</b> "+Math.floor(point.temperature)+" F<br><b style='color:#2288ff;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:{{#theme}}lightgreen{{/theme}}{{^theme}}green{{/theme}};'>Humidity:</b> "+Math.floor(point.humidity)+" %<br><b style='color:#ff3030;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:#ff3030;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:{{#theme}}lightgrey{{/theme}}{{^theme}}grey{{/theme}};'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><br>";
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#ff3030;'>Temperature:</b> "+Math.floor(point.temperature)+" F<br><b style='color:#2288ff;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum*100)/100+" in<br><b style='color:{{#theme}}lightgreen{{/theme}}{{^theme}}green{{/theme}};'>Humidity:</b> "+Math.floor(point.humidity)+" %<br><b style='color:#ff3030;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:#ff3030;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><b style='color:{{#theme}}lightgrey{{/theme}}{{^theme}}grey{{/theme}};'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><br>";
 					return content;
 				}
 			}
@@ -340,7 +340,7 @@ var chart3 = new CanvasJS.Chart("chartContainer3", {
 					//console.log(point.x);
 					//console.log(point.date);
 					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
-					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#2288ff;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:{{#theme}}lightgreen{{/theme}}{{^theme}}green{{/theme}};'>Humidity:</b> "+Math.floor(point.humidity)+" %<br><b style='color:{{#theme}}lightgrey{{/theme}}{{^theme}}grey{{/theme}};'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><br>";
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#2288ff;'>Precip chance:</b> "+Math.floor(point.precipChance)+" %<br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum*100)/100+" in<br><b style='color:{{#theme}}lightgreen{{/theme}}{{^theme}}green{{/theme}};'>Humidity:</b> "+Math.floor(point.humidity)+" %<br><b style='color:{{#theme}}lightgrey{{/theme}}{{^theme}}grey{{/theme}};'>Cloud Cover:</b> "+Math.floor(point.cloudCover)+" %<br><br>";
 					return content;
 				}
 			}
@@ -461,7 +461,7 @@ var chart2 = new CanvasJS.Chart("chartContainer2", {
 						hours-=12;
 					}
 					let dateString = hours+":00 "+apm+" - "+day+", "+month+" "+point.x.getFullYear();
-					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum)+" in<br><b style='color:#ff3030;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:#ff3030;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><br>";
+					content+= "<span style='font-size:1.25em;'>"+dateString+"</span><br><b style='color:#2288ff;'>Precip. Accumulation:</b> "+Math.floor(point.precipAccum*100)/100+" in<br><b style='color:#ff3030;'>Wind Speed:</b> "+Math.floor(point.windSpeed)+" mph<br><b style='color:#ff3030;'>Wind direction:</b> "+Math.floor(point.windDirection)+"<br><br>";
 					
 					return content;
 				}

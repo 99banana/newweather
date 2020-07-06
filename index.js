@@ -261,7 +261,7 @@ async function getWeather(latitude, longitude) {
 					});
 					indexOf = precipDatesArray.indexOf(closest);
 					precip = properties.quantitativePrecipitation.values[indexOf];
-					let precipAccumValue = Math.floor(precip.value * 10)/10;
+					let precipAccumValue = Math.floor(precip.value*0.0393700787 * 100)/100;
 					
 					precipDatesArray = [];
 					for(let xyz = 0; xyz < properties.windSpeed.values.length; xyz++) {
