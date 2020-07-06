@@ -16,6 +16,9 @@ This is my first(ish) node.js project, constructive criticism is welcome.
 I am currently using the closed-source canvasJS graph library.
 Something else open source with similar functionality would be appreciated if you know of one.
 
+**A note about environments**
+When trying to get deployed on vercel, The vercel bot added environments. These are still active, but VERY broken. Use them at your own risk.
+
 ## License
 
 All files included in this repository are licensed under the MPL-2.0 except for the files listed below:
