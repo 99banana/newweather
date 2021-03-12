@@ -7,7 +7,7 @@ const fs = require('fs');
 const Request = require('request');
 const Mustache = require('mustache');
 
-const PORT  = process.env.PORT || 80;
+const PORT   = process.env.PORT || 80;
 const IPADDR = process.env.IPADDR || "127.0.0.1";
 
 let options = {
@@ -630,5 +630,5 @@ let server = http.createServer(function (request, response) {
 			response.end(Mustache.render(data, values));
 		});
 	}
-}).listen(PORT, IPADDR);
+}).listen(PORT);
 console.log('Server running on port '+PORT+' and IP address '+IPADDR);

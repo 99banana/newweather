@@ -18,23 +18,32 @@
 		<h1><a class="solid" href="/{{#theme}}dark{{/theme}}">Newweather</a></h1>
 		<div class="form">
 		
-			<button id="forecastButton" onclick="window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/dark'{{/theme}}" {{#refresh}}disabled{{/refresh}}>Get Forecast</button>
-			<button class="primary" id="autoButton" onclick="getLocation();" {{#refresh}}disabled{{/refresh}}>Find my location</button>
+			<button class="primary" id="autoButton" onclick="getLocation();" {{#refresh}}disabled{{/refresh}}>My Forecast</button>
 			
 			{{^theme}}<button class="buttonDark" onclick="window.location.href=window.location.href+'/dark'" aria-label="Dark theme"><img alt="new weather logo" style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Dark theme</button>{{/theme}}
 			{{#theme}}<button onclick="window.location.href=window.location.href.replace('/dark', '')" aria-label="Light theme"><img alt="new weather logo" style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Light theme</button>{{/theme}}
 			<br><br>
 			
-			{{^latitude}}
-				Latitude <input id="lat" name="latitude" type="number" value="38.466630" {{#refresh}}disabled{{/refresh}}>
-				Longitude <input id="long" name="longitude" type="number" value="-78.880290" {{#refresh}}disabled{{/refresh}}>
-			{{/latitude}}
-			{{#latitude}}
-				Latitude <input id="lat" name="latitude" type="number" value="{{latitude}}" {{#refresh}}disabled{{/refresh}}>
-				Longitude <input id="long" name="longitude" type="number" value="{{longitude}}" {{#refresh}}disabled{{/refresh}}>
-			{{/latitude}}
+			<details>
+				<summary>
+					Or enter longitude and latitude
+				</summary>
+				
+				<br>
+
+				{{^latitude}}
+					Latitude <input id="lat" name="latitude" type="number" value="38.466630" {{#refresh}}disabled{{/refresh}}>
+					Longitude <input id="long" name="longitude" type="number" value="-78.880290" {{#refresh}}disabled{{/refresh}}>
+				{{/latitude}}
+				{{#latitude}}
+					Latitude <input id="lat" name="latitude" type="number" value="{{latitude}}" {{#refresh}}disabled{{/refresh}}>
+					Longitude <input id="long" name="longitude" type="number" value="{{longitude}}" {{#refresh}}disabled{{/refresh}}>
+				{{/latitude}}
+				<br><br>
+				<button id="forecastButton" onclick="toForecast()" {{#refresh}}disabled{{/refresh}}>Get Weather</button>
+			</details>
 		</div>
-		<script  >
+		<script>
 		
 var xxx = document.getElementById("autoButton");
 var yyy = document.getElementById("forecastButton");
@@ -55,7 +64,13 @@ function showPosition(position) {
 	console.log(position);
 	document.getElementById('lat').value = Math.floor(position.coords.latitude*1000000)/1000000;
 	document.getElementById('long').value = Math.floor(position.coords.longitude*1000000)/1000000;
+	toForecast()
 }
+
+function toForecast() {
+	window.location.href='/forecast/'+document.getElementById('lat').value+'/'+document.getElementById('long').value{{#theme}}+'/dark'{{/theme}}
+}
+
 		</script>
 	</div>
 	
