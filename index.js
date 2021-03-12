@@ -26,7 +26,73 @@ function send(response, values) {
 	});
 }
 let weather = {};
+let progress = {};
+
+function isJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+// wrap a request in an promise
+function downloadPage(url) {
+    return new Promise((resolve, reject) => {
+        Request(url, (error, response, body) => {
+            if (error) reject(error);
+            /*if (response.statusCode != 200) {
+                reject('Invalid status code <' + response.statusCode + '>');
+            }*/
+            resolve(body);
+        });
+    });
+}
+
+function toCardinal(i) {
+	if(i >= 348.75 || i < 11.25){
+		return +i + ". -=- N";
+	} else if (i >= 11.25 && i < 33.75) {
+		return +i + ". -=- NNE";
+	} else if (i >= 33.75 && i < 56.25) {
+		return +i + ". -=- NE";
+	} else if (i >= 56.25 && i < 78.75) {
+		return +i + ". -=- ENE";
+	} else if (i >= 78.25 && i < 101.25) {
+		return +i + ". -=- E";
+	} else if (i >= 101.25 && i < 123.75) {
+		return +i + ". -=- ESE";
+	} else if (i >= 123.75 && i < 146.25) {
+		return +i + ". -=- SE";
+	} else if (i >= 146.25 && i < 168.75) {
+		return +i + ". -=- SSE";
+	} else if (i >= 168.75 && i < 191.25) {
+		return +i + ". -=- S";
+	} else if (i >= 191.25 && i < 213.75) {
+		return +i + ". -=- SSW";
+	} else if (i >= 213.75 && i < 236.25) {
+		return +i + ". -=- SW";
+	} else if (i >= 236.25 && i < 258.75) {
+		return +i + ". -=- WSW";
+	} else if (i >= 258.75 && i < 281.25) {
+		return +i + ". -=- W";
+	} else if (i >= 281.25 && i < 303.75) {
+		return +i + ". -=- WNW";
+	} else if (i >= 303.75 && i < 326.25) {
+		return +i + ". -=- NW";
+	} else if (i >= 326.25 && i < 348.75) {
+		return +i + ". -=- NNW";
+	}
+}
+
 async function getWeather(latitude, longitude) {
+	
+	// progress 0%
+	progress[latitude+","+longitude] = {
+		num: 0,
+		txt: "Starting to get weather ...",
+	};
+	
 	let precipitation = "";
 	let precipitationTotal = "";
 	let temperature = "";
@@ -36,6 +102,8 @@ async function getWeather(latitude, longitude) {
 	let thunder = "";
 	let allWeather = "";
 	let cloud = "";
+	let humidity = "";
+	let pressure = "";
 	let options = {
 		"method": "GET",
 		"url": `https://api.weather.gov/points/${latitude},${longitude}`,
@@ -44,31 +112,78 @@ async function getWeather(latitude, longitude) {
 			"Accept": "application/geo+json"
 		}
 	};
+	weather[latitude+","+longitude] = {
+		inProgress: true,
+		timer: Date.now() + 5000
+	};
+	
 	let r = new Request(options, (err, res) => {
+		// progress 0%
+		progress[latitude+","+longitude] = {
+			num: 1,
+			txt: "Getting forecast station and grid ID ...",
+		};
 		if(err) { throw err; }
+		if(!isJsonString(res.body)) {
+			//console.log(res.body);
+			weather[latitude+","+longitude] = {
+				failed: true,
+				message: res.body,
+				timer: Date.now() + 5000
+			}
+			return;
+		}
 		let body = JSON.parse(res.body);
 		if(body === undefined || body.properties === undefined) {
 			weather[latitude+","+longitude] = {
 				failed: true,
-				timer: Date.now() + 20000
+				timer: Date.now() + 5000
 			};
 			return;
 		}
+		//console.log(body.properties);
+		console.log(body.properties);
 		options = {
 			"method": "GET",
 			"url": body.properties.forecastGridData,
-			"headers": { "User-Agent": "node.js v14.4.0 (contact: gjkreider69@gmail.com)", "Accept": "application/geo+json" }
+			"headers": { "User-Agent": "node.js v14.4.0 (website: newweather.openode.io contact: gjkreider69@gmail.com)", "Accept": "application/json,application/geo+json" }
 		};
 		let r2 = new Request(options, (err, res2) => {
+			// progress 0%
+			progress[latitude+","+longitude] = {
+				num: 2,
+				txt: "Getting forecast for gridpoint ...",
+			};
 			if(err) { throw err; }
+			if(!isJsonString(res2.body)) {
+				//console.log(res2.body);
+				weather[latitude+","+longitude] = {
+					failed: true,
+					message: res2.body,
+					timer: Date.now() + 5000
+				}
+				return;
+			}
 			let properties = JSON.parse(res2.body).properties;
 			if(properties === undefined) {
 				weather[latitude+","+longitude] = {
 					failed: true,
-					timer: Date.now() + 20000
+					message: "Properties missing",
+					timer: Date.now() + 5000
 				}
 				return;
 			}
+			for (let prop in properties) {
+				let match = /.+/
+				if(prop.match(match)) {
+					//console.log(prop.match(match));
+				}
+			}
+			// progress 0%
+			progress[latitude+","+longitude] = {
+				num: 3,
+				txt: "Parsing weather data ...",
+			};
 			for(let xyz in properties.probabilityOfPrecipitation.values) {
 				if(properties.probabilityOfPrecipitation.values[xyz]) {
 					let precip = properties.probabilityOfPrecipitation.values[xyz];
@@ -91,7 +206,7 @@ async function getWeather(latitude, longitude) {
 				if(properties.quantitativePrecipitation.values[xyz]) {
 					let precip = properties.quantitativePrecipitation.values[xyz];
 					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
-					let value = Math.floor(precip.value * 10)/10;
+					let value = Math.floor(precip.value*0.0393700787 * 1000)/1000;
 					precipitationTotal+=`{ x: new Date(${date.getTime()}), y:${value} },`;
 				}
 			}
@@ -133,6 +248,19 @@ async function getWeather(latitude, longitude) {
 					cloud+=`{ x: new Date(${date.getTime()}), y:${value} },`;
 				}
 			}
+			for(let xyz in properties.relativeHumidity.values) {
+				if(properties.relativeHumidity.values[xyz]) {
+					let precip = properties.relativeHumidity.values[xyz];
+					let date = new Date(precip.validTime.replace(/\/.+/g, ''));
+					let value = Math.floor(precip.value * 10)/10;
+					humidity+=`{ x: new Date(${date.getTime()}), y:${value} },`;
+				}
+			}
+			// progress 0%
+			progress[latitude+","+longitude] = {
+				num: 4,
+				txt: "Preparing tooltip...",
+			};
 			for(let xyz in properties.temperature.values) {
 				if(properties.temperature.values[xyz]) {
 					let temp = properties.temperature.values[xyz];
@@ -171,7 +299,7 @@ async function getWeather(latitude, longitude) {
 					});
 					indexOf = precipDatesArray.indexOf(closest);
 					precip = properties.quantitativePrecipitation.values[indexOf];
-					let precipAccumValue = Math.floor(precip.value * 10)/10;
+					let precipAccumValue = Math.floor(precip.value*0.0393700787 * 100)/100;
 					
 					precipDatesArray = [];
 					for(let xyz = 0; xyz < properties.windSpeed.values.length; xyz++) {
@@ -250,7 +378,8 @@ async function getWeather(latitude, longitude) {
 						indexOf = precipDatesArray.indexOf(closest);
 						precip = properties.windDirection.values[indexOf];
 					}
-					let windDirValue = properties.windDirection.values[indexOf].value;
+					let windDirValue = toCardinal(properties.windDirection.values[indexOf].value).replace(/\d+. -=- /g, '');
+					//console.log(windDirValue);
 					
 					precipDatesArray = [];
 					for(let xyz = 0; xyz < properties.skyCover.values.length; xyz++) {
@@ -268,9 +397,28 @@ async function getWeather(latitude, longitude) {
 						indexOf = precipDatesArray.indexOf(closest);
 					}
 					let skyCoverValue = properties.skyCover.values[indexOf].value;
+					
+					precipDatesArray = [];
+					for(let xyz = 0; xyz < properties.relativeHumidity.values.length; xyz++) {
+						if(properties.relativeHumidity.values[xyz]) {
+							let precip = properties.relativeHumidity.values[xyz];
+							let precipDate = new Date(precip.validTime.replace(/\/.+/g, ''));
+							precipDatesArray.push(precipDate);
+						}
+					}
+					goal = date;
+					if(precipDatesArray[0] !== undefined) {
+						closest = precipDatesArray.reduce(function(prev, curr) {
+							return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+						});
+						indexOf = precipDatesArray.indexOf(closest);
+					}
+					let humidValue = properties.relativeHumidity.values[indexOf].value;
+					
+					//console.log(humidValue);
 					//console.log(indexOf+'-'+(Date.parse(goal)-Date.parse(precip.validTime.replace(/\/.+/g, '')))/1000/60);
 					if(skyCoverValue == 80) console.log('---------------------------');
-					allWeather+=`{ x: new Date(${date.getTime()}), y:0, temperature:${value}, precipChance:${precipValue}, date: new Date(${date.getTime()}), precipAccum:'${precipAccumValue}', windSpeed:${windSpeedValue}, thunderChance:'${thunderChanceValue}', snowfall:${snowFallValue}, windDirection:${windDirValue}, cloudCover:${skyCoverValue} },\n`
+					allWeather+=`{ x: new Date(${date.getTime()}), temperature:${value}, precipChance:${precipValue}, date: new Date(${date.getTime()}), precipAccum:'${precipAccumValue}', windSpeed:${windSpeedValue}, thunderChance:'${thunderChanceValue}', snowfall:${snowFallValue}, windDirection:"${windDirValue}", cloudCover:${skyCoverValue}, humidity:${humidValue} },\n`
 				}
 			}
 			
@@ -280,24 +428,59 @@ async function getWeather(latitude, longitude) {
 				"headers": { "User-Agent": "node.js v14.4.0 (contact: gjkreider69@gmail.com)", "Accept": "application/geo+json" }
 			};
 			let table = "";
-			let today = ""
-			let r2 = new Request(options, (err, res2) => {
+			let today = "";
+			
+			progress[latitude+","+longitude] = {
+				num: 5,
+				txt: "Preparing table...",
+			};
+			
+			let r2 = new Request(options, async function(err, res2) {
 				if(err) { throw err; }
 				//console.log(res2.body);
-				let properties = JSON.parse(res2.body).properties;
-				if(properties === undefined) {
+				if(!isJsonString(res2.body)) {
+					//console.log(res2.body);
 					weather[latitude+","+longitude] = {
 						failed: true,
-						timer: Date.now() + 20000
+						message: res2.body,
+						timer: Date.now() + 5000
 					}
-					return;
+					today = `Error: API outage`;
+					table = `<tr><td>Error</td><td>0</td><td>Error getting table data.</td></tr>`;
+				}else {
+					let properties = JSON.parse(res2.body).properties;
+					if(properties === undefined) {
+						weather[latitude+","+longitude] = {
+							message: 'Weather Properties Missing.\n'+res2.body,
+							timer: Date.now() + 5000
+						}
+						return;
+					}
+					for(let period in properties.periods) {
+						period = properties.periods[period];
+						table+=`<tr><td>${period.name}</td><td>${period.temperature}</td><td>${period.detailedForecast}</td></tr>`;
+					}
+					today = `${properties.periods[0].name}: ${properties.periods[0].shortForecast}`;
 				}
-				for(let period in properties.periods) {
-					period = properties.periods[period];
-					table+=`<tr><td>${period.name}</td><td>${period.temperature}</td><td>${period.detailedForecast}</td></tr>`;
-				}
-				today = `${properties.periods[0].name}: ${properties.periods[0].shortForecast}`;
+				progress[latitude+","+longitude] = {
+					num: 6,
+					txt: "Getting sunrise/set data...",
+				};
 				
+				let now = new Date(Date.now());
+				now.setDate(now.getDate() - 1);
+				let sunRiseSet = "";
+				for(let xyzz = 0; xyzz < 8; xyzz++) {
+					progress[latitude+","+longitude].num++;
+					now.setDate(now.getDate() + 1);
+					let times = await getSunriseTimes(latitude, longitude, now.toUTCString());
+					//console.log(times);
+					sunRiseSet += `{
+			startValue: new Date(${Date.parse(times.results.sunrise)}),
+			endValue: new Date(${Date.parse(times.results.sunset)}),
+			color: stripColor
+		},`;
+				}
 				weather[latitude+","+longitude] = {
 					precipitation: precipitation,
 					precipitationTotal: precipitationTotal,
@@ -308,38 +491,88 @@ async function getWeather(latitude, longitude) {
 					allWeather: allWeather,
 					snowFall: snowFall,
 					cloud: cloud,
+		    		humidity: humidity,
 					table: {
 						today: today,
 						table: table
 					},
+					sunTimes: sunRiseSet,
 					timer: Date.now() + 1200000
 				}
 				console.log("Weather gotten!");
+				progress[latitude+","+longitude] = {
+					num: 7,
+					txt: "Done!",
+				};
 				
 			});
 		});
 	});
 }
-getWeather(38.466630, -78.880290);
+async function getSunriseTimes(latitude, longitude, date) {
+	let url = `https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}&date=${date}&formatted=0`;
+	let html;
+	try {
+        html = await downloadPage(url);
+		html = JSON.parse(html);
+    } catch (error) {
+        console.error(error);
+    }
+	return html;
+}
+
+//getWeather(38.466630, -78.880290);
+//getSunriseTimes(38.466630, -78.880290, 'Today');
 
 var StaticServer = new(Static.Server)();
 let server = http.createServer(function (request, response) {
-	let theme = false;
-	if(request.url.endsWith('/true')) {
-		theme = true;
+	let theme = '';
+	if(request.url.endsWith('/dark')) {
+		theme = 'dark';
 	}
 	if(request.url.startsWith('/forecast/')) {
 		let longitude = request.url.split('/')[3];
 		let latitude = request.url.split('/')[2];
 		let forecast = weather[latitude+","+longitude];
+		let Wprogress = progress[latitude+","+longitude];
 		if(forecast === undefined || forecast.timer < Date.now()) {
 			getWeather(latitude, longitude);
-			send(response, {
-				forecast: false,
-				refresh: true,
-				theme:theme
-			});
+			if(Wprogress) {
+				send(response, {
+					forecast: false,
+					refresh: true,
+					time: Wprogress.num,
+					message: Wprogress.txt,
+					theme:theme
+				});
+			}else {
+				send(response, {
+					forecast: false,
+					refresh: true,
+					theme:theme
+				});
+			}
+		}else if(forecast.inProgress === true) {
+			if(forecast.timer < Date.now()) {
+				getWeather(latitude, longitude);
+			}
+			if(Wprogress) {
+				send(response, {
+					forecast: false,
+					refresh: true,
+					time: Wprogress.num,
+					message: Wprogress.txt,
+					theme:theme
+				});
+			}else {
+				send(response, {
+					forecast: false,
+					refresh: true,
+					theme:theme
+				});
+			}
 		}else if(forecast.failed === true) {
+			console.log(forecast.message);
 			if(forecast.timer < Date.now()) {
 				getWeather(latitude, longitude);
 				send(response, {
@@ -360,6 +593,7 @@ let server = http.createServer(function (request, response) {
 		}else {
 			send(response, {
 				forecast: true,
+				refresh: false,
 				precipitation: forecast.precipitation,
 				precipitationTotal: forecast.precipitationTotal,
 				temperature: forecast.temperature,
@@ -369,6 +603,8 @@ let server = http.createServer(function (request, response) {
 				allWeather: forecast.allWeather,
 				snowFall: forecast.snowFall,
 				cloud: forecast.cloud,
+				humidity: forecast.humidity,
+				daylightStrips: forecast.sunTimes,
 				sevenDay: {
 					table: forecast.table.table,
 					today: forecast.table.today
@@ -379,8 +615,15 @@ let server = http.createServer(function (request, response) {
 	}else if(request.url.startsWith('/static/')) {
 		request.url = request.url.replace('/static/', '/');
 		StaticServer.serve(request, response);
+	}else if(request.url.startsWith('/data')) {
+		let values = {theme:theme, refresh:false, data:true};
+		response.writeHead(200, {'Content-Type': 'text/html'});
+		fs.readFile('./index.html', 'utf8', function(err, data) {
+			if (err) { throw err; }
+			response.end(Mustache.render(data, values));
+		});
 	}else {
-		let values = {theme:theme};
+		let values = {theme:theme, refresh:false};
 		response.writeHead(200, {'Content-Type': 'text/html'});
 		fs.readFile('./index.html', 'utf8', function(err, data) {
 			if (err) { throw err; }
@@ -388,4 +631,4 @@ let server = http.createServer(function (request, response) {
 		});
 	}
 }).listen(PORT, IPADDR);
-console.log('Server running! PORT:'+PORT+' IPADDR:'+IPADDR);
+console.log('Server running on port '+PORT+' and IP address '+IPADDR);

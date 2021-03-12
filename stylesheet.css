@@ -1,0 +1,165 @@
+body {
+	font-family:Roboto, Arial, sans-serif;
+	font-size:1rem;
+	top: 0px;
+	padding:50px;
+	padding-bottom:50px;
+	position:relative;
+	background:white;
+	color:black;
+}
+* {
+	font-family:Roboto, Arial, sans-serif;
+}
+p, div {
+	font-size:1em;
+}
+input {
+	padding:4px;
+	border:2px solid transparent;
+	background:#ddd;
+	box-shadow:3px 3px 5px #aaa;
+	font-size:1em;
+	width:10em;
+	border-radius:4px;
+}
+input:hover, input:active, input:focus {
+	background:#ccc;
+}
+button {
+	padding:5px;
+	border:2px solid transparent;
+	background:#ddd;
+	box-shadow:3px 3px 5px #aaa;
+	font-size:1em;
+	cursor:pointer;
+	font-weight:bold;
+	border-radius:4px;
+}
+button.primary {
+	font-size:1.1em;
+	color:black;
+	background:#ffe082;
+	box-shadow:3px 3px 6px #caae53;
+}
+button.primary:hover, button.primary:focus {
+	background:#caae53;
+}
+button:hover, button:focus {
+	background:#ccc;
+}
+.buttonDark {
+	color:white;
+	cursor:pointer;
+	background:#444;
+}
+.buttonDark:hover, .buttonDark:focus {
+	background:#777;
+}
+.form {
+	padding:5px;
+	text-align:center;
+}
+h1, h2, h3, h4, h5 {
+	text-align:center;
+}
+.yellow {
+	background: #ffe082;
+	padding: 3px;
+	border-radius: 4px;
+}
+.block {
+	padding: 20px;
+	margin: 0 auto;
+	width: 400px;
+	border: 2px solid #ddd;
+	border-radius: 5px;
+	box-shadow: 3px 3px 5px #aaa;
+}
+.center {
+	display:block;
+	text-align:center;
+}
+table {
+	border-collapse:collapse;
+	width:100%;
+	box-shadow:3px 3px 5px #aaa;
+}
+td {
+	text-align:left;
+	padding:15px;
+	padding-left:30px;
+}
+tr:nth-child(even) {background-color: #f2f2f2;}
+tr:hover {
+	background-color: #ddd;
+}
+tr:nth-child(1):hover {
+	background-color:transparent;
+}
+th {
+	padding:10px;
+	font-size:1.1em;
+	background-color:#ddd;
+	text-align:left;
+	padding-left:30px;
+}
+th:nth-child(1) {
+	border-radius:5px 0px 0px 0px;
+}
+th:nth-child(3) {
+	border-radius:0px 5px 0px 0px;
+}
+.header {
+	position: relative;
+	z-index: 9;
+	background: transparent;
+	padding: 10px 50px;
+	background-color: transparent;
+	background-position: center;
+	overflow: auto;
+	top:0;
+	overflow: auto;
+	border-radius: 5px;
+}
+a.solid {
+	color:black;
+	text-decoration:none;
+	cursor:pointer;
+}
+#floatdiv {
+	position:fixed;
+	top:-50px;
+	height:200%;
+	width:2px;
+	background:red;
+	z-index:99;
+}
+#floatdiv:hover {
+	background:darkred;
+}
+#nooo {
+	position:fixed;
+	top:5;
+	left:5;
+}
+.footer {
+	background-color:lightgrey;
+	padding:10px;
+	margin-top:20px;
+	font-size:15px;
+	font-weight:bold;
+}
+.githubButton {
+	color:black;
+	text-decoration:none;
+	border: 1px solid #ccc;
+	border-radius:3px;
+	padding:3px 7px;
+	background: rgb(175,175,175);
+	background: linear-gradient(0deg, rgba(226,235,234,1) 0%, rgba(255,255,255,1) 100%);
+}
+.githubButton:hover, .githubButton:focus {
+	background: rgb(226,235,234);
+	border-color: #aaa;
+}
