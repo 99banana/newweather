@@ -14,6 +14,7 @@
   "author": "Jesse",
   "license": "MPL-2.0",
   "dependencies": {
+    "bl": "^4.1.0",
     "mustache": "^4.0.1",
     "node-static": "^0.7.11",
     "openode": "^2.0.30",
