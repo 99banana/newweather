@@ -21,7 +21,6 @@ When trying to get deployed on vercel, The vercel bot added environments. These 
 
 ## License
 
-All files included in this repository are licensed under the MPL-2.0 except for the files listed below:
-| File | Where license information can be found |
-|--|--|
-| GitHub-Mark-64px.png | [https://github.com/logos](https://github.com/logos) |
+All files included in this repository are licensed under the MPL-2.0 except for the following:
+
+* GitHub-Mark-64px.png - license info can be found at [https://github.com/logos](https://github.com/logos)
