@@ -37,7 +37,7 @@
 		<script>
 		
 var xxx = document.getElementById("autoButton");
-var yyy = document.getElementById("forecastButton");
+//var yyy = document.getElementById("forecastButton");
 function getLocation() {
 	xxx.innerHTML = "Finding ...";
 	console.log(window.parent.document.location.protocol);
@@ -49,7 +49,7 @@ function getLocation() {
 }
 
 function showPosition(position) {
-	yyy.classList.add('primary');
+	//yyy.classList.add('primary');
 	xxx.classList.remove('primary');
 	xxx.innerHTML = 'Found location';
 	console.log(position);
@@ -143,7 +143,7 @@ function toForecast() {
 	<script>
 
 function locationFromLatLon(lat, lon) {
-    queryUrl = `http://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`
+    queryUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`
     var xmlHttpRGC = new XMLHttpRequest();
     xmlHttpRGC.onreadystatechange = function() { 
         if (xmlHttpRGC.readyState == 4 && xmlHttpRGC.status == 200) {
@@ -156,9 +156,11 @@ function locationFromLatLon(lat, lon) {
 			`.replaceAll("undefined", "Unknown")
         }
     }
-    xmlHttpRGC.onerror = () => {
-        elem.innerHTML = `
-            <a class="search-result" href="/">Error getting results.</a>
+    xmlHttpRGC.onerror = (e) => {
+		console.log(e)
+
+        document.getElementById("7day-head").innerHTML = `
+            7-Day forecast (unknown place name)
         `;
     }
     xmlHttpRGC.open("GET", queryUrl, true); // true for asynchronous 
