@@ -46,7 +46,7 @@ button:hover, button:focus {
 	border-radius: 4px;
 }
 .block {
-	border: 2px solid #444;
+	#border-color: #444;
 	box-shadow: 3px 3px 5px #111;
 }
 table {
@@ -61,4 +61,10 @@ th {
 }
 a.solid {
 	color:white;
+}
+.search-result {
+	color: #88f;
+}
+.search-result:hover {
+	background: #333;
 }

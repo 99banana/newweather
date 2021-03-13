@@ -609,6 +609,10 @@ let server = http.createServer(function (request, response) {
 					table: forecast.table.table,
 					today: forecast.table.today
 				},
+				position: {
+					lat: latitude,
+					lon: longitude
+				},
 				theme:theme
 			});
 		}
@@ -630,5 +634,5 @@ let server = http.createServer(function (request, response) {
 			response.end(Mustache.render(data, values));
 		});
 	}
-}).listen(PORT);
+}).listen(PORT, IPADDR);
 console.log('Server running on port '+PORT+' and IP address '+IPADDR);

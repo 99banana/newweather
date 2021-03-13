@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>Weather ... ?</title>
-		<meta charset="utf-8">
+		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"> 
 		<link rel="icon" href="/static/icon.png">
@@ -10,7 +10,7 @@
 		{{#theme}}<link rel="stylesheet" href="/static/stylesheet-dark.css">{{/theme}}
 		<meta name="description" content="A simple non-bloated, responsive weather app using the US National Weather Service API.">
 		{{#forecast}}
-		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"  ></script>
+		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 		{{/forecast}}
 	</head lang="en">
 	<body>
@@ -18,30 +18,21 @@
 		<h1><a class="solid" href="/{{#theme}}dark{{/theme}}">Newweather</a></h1>
 		<div class="form">
 		
-			<button class="primary" id="autoButton" onclick="getLocation();" {{#refresh}}disabled{{/refresh}}>My Forecast</button>
+			<button class="primary" id="autoButton" onclick="getLocation();" {{#refresh}}disabled{{/refresh}}>Get My Forecast</button>
 			
-			{{^theme}}<button class="buttonDark" onclick="window.location.href=window.location.href+'/dark'" aria-label="Dark theme"><img alt="new weather logo" style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Dark theme</button>{{/theme}}
-			{{#theme}}<button onclick="window.location.href=window.location.href.replace('/dark', '')" aria-label="Light theme"><img alt="new weather logo" style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Light theme</button>{{/theme}}
+			{{^theme}}<button id="theme-btn" class="buttonDark" onclick="window.location.href=window.location.href+'/dark'" aria-label="Dark theme"><img alt="new weather logo" style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Dark theme</button>{{/theme}}
+			{{#theme}}<button id="theme-btn" onclick="window.location.href=window.location.href.replace('/dark', '')" aria-label="Light theme"><img alt="new weather logo" style="margin:0px; margin-bottom:-6px; padding:0px; position:relative; height:20px;" src="/static/icon.png"> Light theme</button>{{/theme}}
 			<br><br>
 			
-			<details>
-				<summary>
-					Or enter longitude and latitude
-				</summary>
-				
-				<br>
+			{{^error}}
+			<div id="location-search">
+				<input type="text" name="place" id="location-search-in" oninput="getLocationData(document.getElementById('location-search-in').value, document.getElementById('search-results'))" placeholder="Or search for somewhere" class="large">
+				<div id="search-results">
+					<!--<a class="search-result" href="/">Enter a place above</a>-->
+				</div>
+			</div>
+			{{/error}}
 
-				{{^latitude}}
-					Latitude <input id="lat" name="latitude" type="number" value="38.466630" {{#refresh}}disabled{{/refresh}}>
-					Longitude <input id="long" name="longitude" type="number" value="-78.880290" {{#refresh}}disabled{{/refresh}}>
-				{{/latitude}}
-				{{#latitude}}
-					Latitude <input id="lat" name="latitude" type="number" value="{{latitude}}" {{#refresh}}disabled{{/refresh}}>
-					Longitude <input id="long" name="longitude" type="number" value="{{longitude}}" {{#refresh}}disabled{{/refresh}}>
-				{{/latitude}}
-				<br><br>
-				<button id="forecastButton" onclick="toForecast()" {{#refresh}}disabled{{/refresh}}>Get Weather</button>
-			</details>
 		</div>
 		<script>
 		
@@ -86,10 +77,10 @@ function toForecast() {
 		<h2>Weather On <span class="yellow">Any Device</span></h2>
 		<h3>Responsive - scales to any device or screen size</h3>
 	</div>
-	<div id="block-3" style="display:none" class="block">
+	<!--<div id="block-3" style="display:none" class="block">
 		<h2>Weather <span class="yellow">Without Bloat</span></h2>
 		<h3>Only the essentials means faster loading.<br><br>Just weather and graphs to display it on.</h3>
-	</div>
+	</div>-->
 	<div id="block-4" style="display:none" class="block">
 		<h2>Weather that's <span class="yellow">Open Source</span></h2>
 		<h3>Everything is better when it's open source.<br><br>
@@ -134,17 +125,51 @@ function toForecast() {
 	{{/refresh}}
 	
 	{{#error}}
-		<h3>Error getting weather data! (position {{latitude}}, {{longitude}})</h3>
-		<h4>This could be because of an <b style="color:darkred;">invalid location</b> or most likely a <b style="color:darkred; font-size:1.1em;">temporary API outage</b>.<br>Retrying in 15 seconds...</h4>
-		<script  >
+		<h3>Error getting weather data!</h3>
+		<span style="display: block; text-align: center">
+			Make sure that this is a valid location in the <b style="color:darkred;">United States</b>.
+			<br><br>
+			If this continually fails, there may be a temporary API outage.
+			<br>Retrying in 5 seconds...</span>
+		<script>
 			setTimeout(function() {
 				location.reload();
-			}, 15000);
+			}, 5000);
 		</script>
 	{{/error}}
 	
 	{{#forecast}}
-	<h2>7-Day forecast</h2>
+	
+	<script>
+
+function locationFromLatLon(lat, lon) {
+    queryUrl = `http://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`
+    var xmlHttpRGC = new XMLHttpRequest();
+    xmlHttpRGC.onreadystatechange = function() { 
+        if (xmlHttpRGC.readyState == 4 && xmlHttpRGC.status == 200) {
+            let data = xmlHttpRGC.responseText
+            index = 0;
+            parsed = JSON.parse(data)
+            console.log(parsed)
+			document.getElementById("7day-head").innerHTML = `
+				7-Day forecast for ${parsed.address.city}, ${parsed.address.state}
+			`.replaceAll("undefined", "Unknown")
+        }
+    }
+    xmlHttpRGC.onerror = () => {
+        elem.innerHTML = `
+            <a class="search-result" href="/">Error getting results.</a>
+        `;
+    }
+    xmlHttpRGC.open("GET", queryUrl, true); // true for asynchronous 
+    xmlHttpRGC.send(null);
+}
+
+locationFromLatLon({{position.lat}}, {{position.lon}})
+
+	</script>
+
+	<h2 id="7day-head">7-Day forecast</h2>
 	<div id="chartContainer0" style="height: 210px; width: 100%; position: relative"></div> 
 	<div id="chartContainer3" style="height: 250px; width: 100%; position: relative"></div>
 	<div id="chartContainer2" style="height: 200px; width: 100%; position: relative"></div>
@@ -597,5 +622,9 @@ for(let xxy = 0; xxy < document.querySelectorAll(".canvasjs-chart-container > .c
 			<b>Newweather is open source!</b><br><br>
 			<a class="githubButton" href="https://github.com/99banana/newweather" aria-label="View source code on GitHub"><img alt="git hub logo" style="margin:0px; margin-bottom:-5px; padding:0px; position:relative; height:20px;" src="/static/GitHub-Mark-64px.png"> View source code on GitHub</a>
 		</div>
+		<script>
+			let darkThemeVar = "{{#theme}}dark{{/theme}}"
+		</script>
+		<script src="/static/xml.js"></script>
 	</body>
 </html>
