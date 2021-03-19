@@ -3,7 +3,8 @@
 
 View now at [newweather.openode.io](https://newweather.openode.io/)
 
-**A random note** I've neglected this project for a while, mostly bc I'm scared to touch it. I put it back online a few days ago, but that doesn't mean it's very stable. Also, looking at the code may be hazardous to your health. You've been warned.
+### A random note
+I've neglected this project for a while, mostly bc I'm scared to touch it. I put it back online a few days ago, but that doesn't mean it's very stable. Also, looking at the code may be hazardous to your health. You've been warned.
 
 ## Note about downtime
 Sorry if the openode server is down a lot. I have a rather sporadic dev cycle. Updates take a bit to deploy, and breakages may take a bit of time to solve.
